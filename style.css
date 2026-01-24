@@ -1,30 +1,30 @@
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* FAB回転 */
-#fab-main.active {
-    background-color: #f1f5f9;
-    color: #94a3b8;
-    transform: rotate(135deg);
+/* パート別色分け */
+.part-tag-Gt { background-color: #fee2e2; color: #991b1b; }
+.part-tag-Ba { background-color: #dbeafe; color: #1e40af; }
+.part-tag-Dr { background-color: #fef3c7; color: #92400e; }
+.part-tag-Key { background-color: #f3e8ff; color: #6b21a8; }
+.part-tag-Vo { background-color: #dcfce7; color: #166534; }
+
+.part-chip.active {
+    background-color: #bef264;
+    color: #3f6212;
+    border-color: #a3e635;
+    transform: scale(1.05);
 }
 
-/* 子ボタンの表示状態 */
-.fab-child-show {
-    transform: translateY(0) scale(1) !important;
-    opacity: 1 !important;
-}
+.is-fav { color: #f43f5e !important; }
 
-/* 編集モーダルアニメーション */
-#edit-content.show {
-    transform: translateY(0);
-    opacity: 1;
+/* コメント詳細展開 */
+.comment-area {
+    max-height: 1.5rem; /* 通常時（1行程度） */
+    overflow: hidden;
+    transition: max-height 0.4s ease;
 }
-
-/* 編集中のFAB非表示用 */
-.fab-hidden {
-    transform: scale(0);
-    opacity: 0;
-    pointer-events: none;
+.card-open .comment-area {
+    max-height: 150px; /* 展開時 */
 }
 
 @keyframes fadeIn {
@@ -32,3 +32,4 @@
     to { opacity: 1; transform: translateY(0); }
 }
 .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+.fab-child-show { transform: translateY(0) scale(1) !important; opacity: 1 !important; }
