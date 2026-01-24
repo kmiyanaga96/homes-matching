@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    </head>
+</head>
 <body class="bg-slate-50 min-h-screen pb-24 text-slate-900">
 
     <header class="bg-[#d9f99d] text-slate-700 p-5 shadow-sm sticky top-0 z-20 border-b border-[#bef264]">
@@ -38,17 +38,23 @@
                     ❤️ お気に入り
                 </button>
                 <select id="filter-grade" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
-                    <option value="">すべての学年</option>
+                    <option value="">学年</option>
                     <option value="1">1年</option><option value="2">2年</option><option value="3">3年</option><option value="4">4年</option><option value="卒業生">卒業生</option>
                 </select>
                 <select id="filter-part" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
-                    <option value="">すべてのパート</option>
+                    <option value="">パート</option>
                     <option value="Gt">Gt</option><option value="Ba">Ba</option><option value="Dr">Dr</option><option value="Vo">Vo</option><option value="Key">Key</option>
                 </select>
                 <select id="filter-status" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
-                    <option value="">すべての状態</option>
+                    <option value="">いつ組む？</option>
                     <option value="ミニライブ">ミニライブ</option><option value="定期ライブ">定期ライブ</option><option value="合宿">合宿</option><option value="非公式ライブ">非公式ライブ</option><option value="DMして">DMして</option><option value="むり">むり</option>
                 </select>
+                <button id="sort-btn" class="bg-white border border-slate-100 shadow-sm rounded-xl px-4 py-2 text-sm font-bold outline-none text-slate-500 whitespace-nowrap flex items-center space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                    </svg>
+                    <span id="sort-label">更新順</span>
+                </button>
             </div>
         </div>
 

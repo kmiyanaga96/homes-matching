@@ -1,21 +1,39 @@
 body {
     overscroll-behavior-y: auto;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* ローディングが消える時のアニメーション */
 .fade-out {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease-out;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* FAB回転と子ボタンアニメーション */
+#fab-main.active {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    transform: rotate(135deg);
 }
 
-.scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+.fab-child-show {
+    transform: translateY(0) scale(1) !important;
+    opacity: 1 !important;
+}
+
+/* 編集モーダルのスライド表示 */
+#edit-content.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* プレビュー用カードの特別演出 */
+#edit-preview-card {
+    transition: all 0.3s ease;
+    transform: scale(0.95);
 }
 
 @keyframes fadeIn {
