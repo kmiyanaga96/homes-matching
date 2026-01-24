@@ -1,0 +1,38 @@
+body {
+    overscroll-behavior-y: auto;
+}
+
+/* ローディングが消える時のアニメーション */
+.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease-out;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.heart-pop {
+    animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes heartPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4); }
+    100% { transform: scale(1); }
+}
