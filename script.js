@@ -11,12 +11,12 @@ async function fetchMembers() {
     try {
         const resp = await fetch(API_URL);
         allMembers = await resp.json();
-        applyFilters(); // 取得後にフィルタを適用して描画
+        applyFilters();
     } catch (e) { console.error(e); }
     if (loader) loader.classList.add('hidden');
 }
 
-// --- フィルタリング統合ロジック ---
+// --- フィルタリング統合 ---
 function applyFilters() {
     const nameVal = document.getElementById('search-name').value.toLowerCase();
     const partVal = document.getElementById('filter-part').value;
@@ -27,7 +27,7 @@ function applyFilters() {
         const matchName = m.name.toLowerCase().includes(nameVal);
         const matchPart = partVal === "" || (m.part && m.part.split('/').includes(partVal));
         const matchGrade = gradeVal === "" || String(m.grade) === gradeVal;
-        const matchStatus = statusVal === "" || m.status === statusVal;
+        const matchStatus = statusVal === "" || (m.status && m.status.split('/').includes(statusVal));
         const matchFav = !isFavFilterActive || favorites.includes(m.id);
         return matchName && matchPart && matchGrade && matchStatus && matchFav;
     });
@@ -43,9 +43,10 @@ function renderMembers(displayList) {
     displayList.forEach((m, i) => {
         const isFav = favorites.includes(m.id);
         const isOBOG = m.grade === "OB/OG";
-        const obogClass = isOBOG ? "card-obog" : ""; // 卒業生用クラス
+        const obogClass = isOBOG ? "card-obog" : "";
         const parts = (m.part || "").split('/');
         const partTags = parts.map(p => `<span class="part-tag-${p} px-2 py-0.5 rounded text-[9px] font-bold mr-1">${p}</span>`).join('');
+        const statusDisplay = (m.status || "").split('/').join(', ');
 
         const cardHTML = `
             <div id="card-${m.id}" class="bg-white rounded-[2rem] shadow-sm p-5 animate-fadeIn ${obogClass}" style="animation-delay: ${i*0.02}s">
@@ -59,33 +60,26 @@ function renderMembers(displayList) {
                     </div>
                     <button onclick="toggleFavorite('${m.id}')" class="p-2 text-xl"><span id="heart-${m.id}" class="${isFav ? 'is-fav' : 'text-slate-200'}">${isFav ? '❤️' : '♡'}</span></button>
                 </div>
-                
                 <div class="mt-3 px-1 cursor-pointer" onclick="toggleCard('${m.id}')">
-                    <p class="text-[10px] text-orange-400 font-bold mb-1">● ${m.status}</p>
+                    <p class="text-[10px] text-orange-400 font-bold mb-1">● ${statusDisplay}</p>
                     <div class="comment-area"><p class="text-[11px] text-slate-500 leading-relaxed">${m.comment || 'よろしくお願いします！'}</p></div>
                 </div>
-
                 <div class="mt-3 flex justify-between items-center border-t border-slate-50 pt-3">
-                    <a href="https://twitter.com/${m.id}" target="_blank" class="text-sky-500 text-[10px] font-bold flex items-center">
-                        <svg class="w-3 h-3 mr-1 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                        @${m.id}
-                    </a>
+                    <a href="https://twitter.com/${m.id}" target="_blank" class="text-sky-500 text-[10px] font-bold flex items-center">@${m.id}</a>
                 </div>
             </div>`;
         container.insertAdjacentHTML('beforeend', cardHTML);
     });
 }
 
-// --- 制御系 ---
+// --- 各種制御 ---
 function toggleCard(id) { document.getElementById(`card-${id}`).classList.toggle('card-open'); }
-
 function toggleFavorite(id) {
     const index = favorites.indexOf(id);
     index === -1 ? favorites.push(id) : favorites.splice(index, 1);
     localStorage.setItem('fav_members', JSON.stringify(favorites));
     applyFilters();
 }
-
 function toggleFavFilter() {
     isFavFilterActive = !isFavFilterActive;
     const btn = document.getElementById('filter-fav');
@@ -96,17 +90,15 @@ function toggleFavFilter() {
 }
 
 function togglePart(btn) { btn.classList.toggle('active'); updatePreview(); }
+function toggleStatusChip(btn) { btn.classList.toggle('active'); updatePreview(); }
 
 function openEditModal() {
     if (isMenuOpen) toggleMenu();
-    document.getElementById('fab-group').classList.add('hidden');
-    document.getElementById('refresh-btn').classList.add('hidden');
     document.getElementById('edit-modal').classList.remove('hidden');
+    document.querySelectorAll('.part-chip, .status-chip').forEach(c => c.classList.remove('active'));
     setTimeout(() => {
-        const content = document.getElementById('edit-content');
-        content.classList.replace('scale-90', 'scale-100');
-        content.classList.replace('opacity-0', 'opacity-100');
-        updatePreview();
+        document.getElementById('edit-content').classList.replace('scale-90', 'scale-100');
+        document.getElementById('edit-content').classList.replace('opacity-0', 'opacity-100');
     }, 10);
 }
 
@@ -114,27 +106,26 @@ function closeEditModal() {
     const content = document.getElementById('edit-content');
     content.classList.replace('scale-100', 'scale-90');
     content.classList.replace('opacity-100', 'opacity-0');
-    setTimeout(() => {
-        document.getElementById('edit-modal').classList.add('hidden');
-        document.getElementById('fab-group').classList.remove('hidden');
-        document.getElementById('refresh-btn').classList.remove('hidden');
-    }, 200);
+    setTimeout(() => document.getElementById('edit-modal').classList.add('hidden'), 200);
 }
 
 async function handleFinalize() {
     const btn = document.getElementById('btn-finalize');
-    const selectedParts = Array.from(document.querySelectorAll('.part-chip.active')).map(c => c.dataset.value).join('/');
+    const getChips = (selector) => Array.from(document.querySelectorAll(selector)).map(c => c.dataset.value).join('/');
+    
     const payload = {
         name: document.getElementById('edit-name').value,
         grade: document.getElementById('edit-grade').value,
-        part: selectedParts,
-        status: document.getElementById('edit-status').value,
+        part: getChips('.part-chip.active'),
+        status: getChips('.status-chip.active'),
         comment: document.getElementById('edit-comment').value,
         id: document.getElementById('edit-auth-id').value,
         pass: document.getElementById('edit-pass').value
     };
 
-    if (!payload.name || !payload.id || payload.pass.length !== 4) return alert("入力内容を確認してください(PWは4桁)");
+    if (!payload.name || !payload.id || !payload.part || !payload.status || payload.pass.length !== 4) {
+        return alert("必須項目をすべて入力してください");
+    }
 
     btn.disabled = true;
     btn.innerText = "送信中...";
@@ -149,13 +140,11 @@ async function handleFinalize() {
 }
 
 function updatePreview() {
-    const name = document.getElementById('edit-name').value || "名前";
     const id = document.getElementById('edit-auth-id').value;
     const preview = document.getElementById('edit-preview-card');
-    preview.innerHTML = `<div class="flex items-center space-x-2 p-1 opacity-50 scale-90"><img src="https://unavatar.io/twitter/${id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(name)}" class="w-7 h-7 rounded-full"><span class="text-[10px] font-bold">@${id}</span></div>`;
+    preview.innerHTML = `<div class="flex items-center space-x-2 p-1 opacity-50 scale-90"><span class="text-[10px] font-bold">@${id || 'ID'}</span></div>`;
 }
 
-// --- メニュー制御 ---
 function toggleMenu() {
     isMenuOpen = !isMenuOpen;
     const fab = document.getElementById('fab-main');
@@ -170,11 +159,9 @@ function toggleMenu() {
     }
 }
 
-// イベント
 document.getElementById('search-name').addEventListener('input', applyFilters);
 document.getElementById('fab-main').addEventListener('click', toggleMenu);
 document.getElementById('btn-login-open').addEventListener('click', openEditModal);
 document.getElementById('refresh-btn').addEventListener('click', fetchMembers);
-document.querySelectorAll('#edit-modal input, #edit-modal select, #edit-modal textarea').forEach(el => el.addEventListener('input', updatePreview));
 
 fetchMembers();

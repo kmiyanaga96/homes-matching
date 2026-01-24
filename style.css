@@ -8,16 +8,17 @@
 .part-tag-Key { background-color: #f3e8ff; color: #6b21a8; }
 .part-tag-Vo { background-color: #dcfce7; color: #166534; }
 
-.part-chip.active {
+/* チップスタイル（パート・ステータス共通） */
+.part-chip.active, .status-chip.active {
     background-color: #bef264;
     color: #3f6212;
     border-color: #a3e635;
     transform: scale(1.05);
 }
 
-/* OB/OG用カードスタイル */
+/* OB/OG用カード背景（落ち着いたグレー） */
 .card-obog {
-    background-color: #f1f5f9 !important; /* 少し暗めのグレー */
+    background-color: #f1f5f9 !important;
     border: 1px solid #e2e8f0;
 }
 
