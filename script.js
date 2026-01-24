@@ -1,40 +1,59 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbz8uRbvgYokCEfeK5LajVDBuSNn6ZnfmL1ZuCaF44nTmQ7PfL4OFVdecrdTRwXO6_8Y/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbz8uRbvgYokCEfeK5LajVDBuSNn6ZnfmL1ZuCaF44nTmQ7PfL4OFVdecrdTRwXO6_8Y/exec";
 let allMembers = [];
 let favorites = JSON.parse(localStorage.getItem('fav_members') || "[]");
 let isMenuOpen = false;
 let isFavFilterActive = false;
 
-// --- 読込 ---
+// --- データ取得 ---
 async function fetchMembers() {
     const loader = document.getElementById('loading');
     if (loader) loader.classList.remove('hidden');
     try {
         const resp = await fetch(API_URL);
         allMembers = await resp.json();
-        renderMembers(allMembers);
+        applyFilters(); // 取得後にフィルタを適用して描画
     } catch (e) { console.error(e); }
     if (loader) loader.classList.add('hidden');
 }
 
+// --- フィルタリング統合ロジック ---
+function applyFilters() {
+    const nameVal = document.getElementById('search-name').value.toLowerCase();
+    const partVal = document.getElementById('filter-part').value;
+    const gradeVal = document.getElementById('filter-grade').value;
+    const statusVal = document.getElementById('filter-status').value;
+
+    const filtered = allMembers.filter(m => {
+        const matchName = m.name.toLowerCase().includes(nameVal);
+        const matchPart = partVal === "" || (m.part && m.part.split('/').includes(partVal));
+        const matchGrade = gradeVal === "" || String(m.grade) === gradeVal;
+        const matchStatus = statusVal === "" || m.status === statusVal;
+        const matchFav = !isFavFilterActive || favorites.includes(m.id);
+        return matchName && matchPart && matchGrade && matchStatus && matchFav;
+    });
+
+    renderMembers(filtered);
+}
+
 // --- 描画 ---
-function renderMembers(members) {
+function renderMembers(displayList) {
     const container = document.getElementById('member-list');
-    const displayList = isFavFilterActive ? members.filter(m => favorites.includes(m.id)) : members;
-    
     container.innerHTML = displayList.length === 0 ? '<p class="text-center text-slate-400 py-20 text-xs">メンバーが見つかりません</p>' : "";
     
     displayList.forEach((m, i) => {
         const isFav = favorites.includes(m.id);
+        const isOBOG = m.grade === "OB/OG";
+        const obogClass = isOBOG ? "card-obog" : ""; // 卒業生用クラス
         const parts = (m.part || "").split('/');
         const partTags = parts.map(p => `<span class="part-tag-${p} px-2 py-0.5 rounded text-[9px] font-bold mr-1">${p}</span>`).join('');
 
         const cardHTML = `
-            <div id="card-${m.id}" class="bg-white rounded-[2rem] shadow-sm p-5 animate-fadeIn" style="animation-delay: ${i*0.02}s">
+            <div id="card-${m.id}" class="bg-white rounded-[2rem] shadow-sm p-5 animate-fadeIn ${obogClass}" style="animation-delay: ${i*0.02}s">
                 <div class="flex items-start justify-between">
                     <div class="flex items-center space-x-4 flex-1">
                         <img src="https://unavatar.io/twitter/${m.id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}" class="w-12 h-12 rounded-full bg-slate-100 object-cover">
                         <div class="flex-1 min-w-0">
-                            <h2 class="font-bold text-slate-700 text-sm">${m.name} <span class="text-[10px] text-slate-400 font-normal">/ ${m.grade}年</span></h2>
+                            <h2 class="font-bold text-slate-700 text-sm">${m.name} <span class="text-[10px] text-slate-400 font-normal">/ ${m.grade}${isNaN(m.grade)?'':'年'}</span></h2>
                             <div class="flex mt-1">${partTags}</div>
                         </div>
                     </div>
@@ -43,9 +62,7 @@ function renderMembers(members) {
                 
                 <div class="mt-3 px-1 cursor-pointer" onclick="toggleCard('${m.id}')">
                     <p class="text-[10px] text-orange-400 font-bold mb-1">● ${m.status}</p>
-                    <div class="comment-area">
-                        <p class="text-[11px] text-slate-500 leading-relaxed">${m.comment || 'よろしくお願いします！'}</p>
-                    </div>
+                    <div class="comment-area"><p class="text-[11px] text-slate-500 leading-relaxed">${m.comment || 'よろしくお願いします！'}</p></div>
                 </div>
 
                 <div class="mt-3 flex justify-between items-center border-t border-slate-50 pt-3">
@@ -66,7 +83,7 @@ function toggleFavorite(id) {
     const index = favorites.indexOf(id);
     index === -1 ? favorites.push(id) : favorites.splice(index, 1);
     localStorage.setItem('fav_members', JSON.stringify(favorites));
-    renderMembers(allMembers);
+    applyFilters();
 }
 
 function toggleFavFilter() {
@@ -75,7 +92,7 @@ function toggleFavFilter() {
     btn.classList.toggle('text-rose-500', isFavFilterActive);
     btn.classList.toggle('border-rose-100', isFavFilterActive);
     document.getElementById('fav-filter-icon').innerText = isFavFilterActive ? "❤️" : "🤍";
-    renderMembers(allMembers);
+    applyFilters();
 }
 
 function togglePart(btn) { btn.classList.toggle('active'); updatePreview(); }
@@ -138,7 +155,7 @@ function updatePreview() {
     preview.innerHTML = `<div class="flex items-center space-x-2 p-1 opacity-50 scale-90"><img src="https://unavatar.io/twitter/${id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(name)}" class="w-7 h-7 rounded-full"><span class="text-[10px] font-bold">@${id}</span></div>`;
 }
 
-// --- FAB ---
+// --- メニュー制御 ---
 function toggleMenu() {
     isMenuOpen = !isMenuOpen;
     const fab = document.getElementById('fab-main');
@@ -153,6 +170,8 @@ function toggleMenu() {
     }
 }
 
+// イベント
+document.getElementById('search-name').addEventListener('input', applyFilters);
 document.getElementById('fab-main').addEventListener('click', toggleMenu);
 document.getElementById('btn-login-open').addEventListener('click', openEditModal);
 document.getElementById('refresh-btn').addEventListener('click', fetchMembers);

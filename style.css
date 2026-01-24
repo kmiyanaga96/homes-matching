@@ -15,16 +15,22 @@
     transform: scale(1.05);
 }
 
+/* OB/OG用カードスタイル */
+.card-obog {
+    background-color: #f1f5f9 !important; /* 少し暗めのグレー */
+    border: 1px solid #e2e8f0;
+}
+
 .is-fav { color: #f43f5e !important; }
 
 /* コメント詳細展開 */
 .comment-area {
-    max-height: 1.5rem; /* 通常時（1行程度） */
+    max-height: 1.5rem;
     overflow: hidden;
     transition: max-height 0.4s ease;
 }
 .card-open .comment-area {
-    max-height: 150px; /* 展開時 */
+    max-height: 150px;
 }
 
 @keyframes fadeIn {

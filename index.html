@@ -21,14 +21,26 @@
 
     <main id="app" class="p-4 max-w-md mx-auto">
         <div class="mb-6 space-y-3">
-            <input type="text" id="search-name" placeholder="名前やパートで検索..." class="w-full p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-base">
+            <input type="text" id="search-name" placeholder="名前で検索..." class="w-full p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-base">
+            
             <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-hide">
-                <button id="filter-fav" onclick="toggleFavFilter()" class="bg-white shadow-sm rounded-xl px-4 py-2 text-sm text-gray-400 border border-transparent transition-all">
+                <button id="filter-fav" onclick="toggleFavFilter()" class="bg-white shadow-sm rounded-xl px-4 py-2 text-sm text-gray-400 border border-transparent transition-all whitespace-nowrap">
                     <span id="fav-filter-icon">🤍</span> お気に入り
                 </button>
-                <select id="filter-grade" class="bg-white shadow-sm rounded-xl px-3 py-2 text-xs text-gray-500 border-none outline-none"><option value="">学年</option><option value="1">1年</option><option value="2">2年</option><option value="3">3年</option><option value="4">4年</option><option value="OB/OG">OB/OG</option></select>
-                <select id="filter-status" class="bg-white shadow-sm rounded-xl px-3 py-2 text-xs text-gray-500 border-none outline-none">
-                    <option value="">いつ組む？</option><option value="ミニライブ">ミニライブ</option><option value="定期ライブ">定期ライブ</option><option value="合宿">合宿</option><option value="非公式ライブ">非公式ライブ</option><option value="DMして">DMして</option><option value="むり">むり</option>
+                
+                <select id="filter-part" onchange="applyFilters()" class="bg-white shadow-sm rounded-xl px-3 py-2 text-xs text-gray-500 border-none outline-none">
+                    <option value="">パート</option>
+                    <option value="Gt">Gt</option><option value="Ba">Ba</option><option value="Dr">Dr</option><option value="Key">Key</option><option value="Vo">Vo</option>
+                </select>
+
+                <select id="filter-grade" onchange="applyFilters()" class="bg-white shadow-sm rounded-xl px-3 py-2 text-xs text-gray-500 border-none outline-none">
+                    <option value="">学年</option>
+                    <option value="1">1年</option><option value="2">2年</option><option value="3">3年</option><option value="4">4年</option><option value="OB/OG">OB/OG</option>
+                </select>
+
+                <select id="filter-status" onchange="applyFilters()" class="bg-white shadow-sm rounded-xl px-3 py-2 text-xs text-gray-500 border-none outline-none">
+                    <option value="">いつ組む？</option>
+                    <option value="ミニライブ">ミニライブ</option><option value="定期ライブ">定期ライブ</option><option value="合宿">合宿</option><option value="非公式ライブ">非公式ライブ</option><option value="DMして">DMして</option><option value="むり">むり</option>
                 </select>
             </div>
         </div>
