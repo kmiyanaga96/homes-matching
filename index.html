@@ -8,15 +8,24 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ほーむずマッチング">
+    <meta property="og:description" content="バンドメンバー探しアプリ">
+    <meta property="og:image" content="https://kmiyanaga96.github.io/homes-matching/homes-logo.png">
+    <meta property="og:url" content="https://kmiyanaga96.github.io/homes-matching/">
+    <meta name="twitter:card" content="summary"> ```
+
     <style>
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
         
+        /* ハートのアニメーション */
         .heart-pop { animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes heartPop {
             0% { transform: scale(1); }
@@ -25,7 +34,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-10">
+<body class="bg-slate-50 min-h-screen pb-24">
 
     <header class="bg-[#d9f99d] text-slate-700 p-5 shadow-sm sticky top-0 z-20 border-b border-[#bef264]">
         <h1 class="text-xl font-bold text-center tracking-tight">ほーむずマッチング</h1>
@@ -35,7 +44,7 @@
         
         <div class="mb-6 space-y-3">
             <div class="relative">
-                <input type="text" id="search-name" placeholder="名前やジャンルで検索..." 
+                <input type="text" id="search-name" placeholder="名前やコメントで検索..." 
                        class="w-full p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-gray-700 text-base placeholder-gray-400">
             </div>
             
@@ -43,6 +52,15 @@
                 <button id="filter-fav" class="bg-white border border-transparent shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-400 whitespace-nowrap transition-all">
                     ❤️ お気に入り
                 </button>
+
+                <select id="filter-grade" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
+                    <option value="">すべての学年</option>
+                    <option value="1">1年</option>
+                    <option value="2">2年</option>
+                    <option value="3">3年</option>
+                    <option value="4">4年</option>
+                    <option value="卒業生">卒業生</option>
+                </select>
 
                 <select id="filter-part" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
                     <option value="">すべてのパート</option>
@@ -55,8 +73,12 @@
 
                 <select id="filter-status" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
                     <option value="">すべての状態</option>
-                    <option value="募集中">メンバー募集中</option>
-                    <option value="セッション">セッションのみ</option>
+                    <option value="ミニライブ">ミニライブ</option>
+                    <option value="定期ライブ">定期ライブ</option>
+                    <option value="合宿">合宿</option>
+                    <option value="非公式ライブ">非公式ライブ</option>
+                    <option value="DMして">DMして</option>
+                    <option value="むり">むり</option>
                 </select>
             </div>
         </div>
@@ -69,9 +91,14 @@
         <div id="member-list" class="grid gap-4"></div>
     </main>
 
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeAn4-PCCxvCJxoHbXUDVCDMvl4m0ELLmURxCAjAE_SJoDKcQ/viewform?usp=header" target="_blank" 
+       class="fixed bottom-6 right-6 bg-[#bef264] text-slate-700 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl hover:scale-110 transition-transform z-50 border-2 border-white">
+        <span class="mb-1">+</span>
+    </a>
+
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbz8uRbvgYokCEfeK5LajVDBuSNn6ZnfmL1ZuCaF44nTmQ7PfL4OFVdecrdTRwXO6_8Y/exec";
-        
+    
         let allMembers = [];
         let favorites = JSON.parse(localStorage.getItem('homes_favs')) || [];
         let showOnlyFavs = false;
@@ -79,11 +106,16 @@
         async function fetchMembers() {
             try {
                 const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
                 allMembers = await response.json();
                 updateList(); 
                 document.getElementById('loading').classList.add('hidden');
             } catch (error) {
-                document.getElementById('loading').innerHTML = `<p>読み込みに失敗しました</p>`;
+                console.error("Fetch error:", error);
+                document.getElementById('loading').innerHTML = `
+                    <p class="text-gray-400 font-bold">データを読み込めませんでした</p>
+                    <button onclick="location.reload()" class="mt-4 px-6 py-2 bg-[#d9f99d] text-slate-700 rounded-full text-xs font-bold shadow-sm">再読み込み</button>
+                `;
             }
         }
 
@@ -100,6 +132,7 @@
 
         function updateList() {
             const nameQuery = (document.getElementById('search-name').value || "").toLowerCase();
+            const gradeQuery = document.getElementById('filter-grade').value;
             const partQuery = document.getElementById('filter-part').value;
             const statusQuery = document.getElementById('filter-status').value;
 
@@ -108,9 +141,11 @@
                 const matchFav = !showOnlyFavs || isFav;
                 const matchName = (m.name || "").toLowerCase().includes(nameQuery) || 
                                   (m.comment || "").toLowerCase().includes(nameQuery);
+                const matchGrade = gradeQuery === "" || String(m.grade) === gradeQuery;
                 const matchPart = partQuery === "" || (m.part || "").includes(partQuery);
                 const matchStatus = statusQuery === "" || (m.status || "").includes(statusQuery);
-                return matchFav && matchName && matchPart && matchStatus;
+            
+                return matchFav && matchName && matchGrade && matchPart && matchStatus;
             });
 
             renderMembers(filtered);
@@ -119,12 +154,18 @@
         function renderMembers(members) {
             const listContainer = document.getElementById('member-list');
             listContainer.innerHTML = "";
-            
+        
+            if (members.length === 0) {
+                listContainer.innerHTML = `<p class="text-center text-gray-400 py-10 text-sm">該当するメンバーがいません</p>`;
+                return;
+            }
+
             members.forEach((m, index) => {
                 const isFav = favorites.includes(m.id);
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-3xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] p-5 flex items-center space-x-4 relative border border-transparent animate-fadeIn";
-                
+                card.className = "bg-white rounded-3xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] p-5 flex items-center space-x-4 relative border border-transparent hover:border-[#d9f99d] transition-all animate-fadeIn";
+                card.style.animationDelay = `${index * 0.05}s`;
+            
                 const iconUrl = m.id 
                     ? `https://unavatar.io/twitter/${m.id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=f1f5f9&color=cbd5e1`
                     : `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=f1f5f9&color=cbd5e1`;
@@ -132,6 +173,7 @@
                 card.innerHTML = `
                     <div class="relative flex-shrink-0">
                         <img src="${iconUrl}" class="w-16 h-16 rounded-full bg-slate-100 object-cover border-2 border-white" alt="">
+                        ${(m.status !== 'むり') ? '<span class="absolute -top-1 -right-1 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-lime-500"></span></span>' : ''}
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-start">
@@ -142,11 +184,14 @@
                                 </svg>
                             </button>
                         </div>
-                        <p class="text-[#65a30d] text-[13px] font-bold mt-0.5">${m.part}</p>
+                        <div class="flex items-center space-x-2 mt-0.5">
+                            <p class="text-[#65a30d] text-[13px] font-bold">${m.part}</p>
+                            <span class="text-[10px] text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100">${m.grade}${isNaN(m.grade) ? '' : '年'}</span>
+                        </div>
+                        <p class="text-[10px] font-bold text-orange-400 uppercase tracking-tighter mt-1">${m.status}</p>
                         <p class="text-[11px] text-slate-400 mt-1 line-clamp-1 leading-relaxed">${m.comment || ''}</p>
                         <div class="mt-4 flex items-center justify-between">
-                            <a href="https://twitter.com/${m.id}" target="_blank" class="text-[10px] font-bold bg-slate-700 text-white px-5 py-2 rounded-full hover:bg-slate-900 shadow-sm">X PROFILE</a>
-                            <span class="text-[10px] text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">${m.university || ''}</span>
+                            <a href="https://twitter.com/${m.id}" target="_blank" class="text-[10px] font-bold bg-slate-700 text-white px-5 py-2 rounded-full hover:bg-slate-900 transition-colors shadow-sm">X PROFILE</a>
                         </div>
                     </div>
                 `;
@@ -155,9 +200,10 @@
         }
 
         document.getElementById('search-name').addEventListener('input', updateList);
+        document.getElementById('filter-grade').addEventListener('change', updateList);
         document.getElementById('filter-part').addEventListener('change', updateList);
         document.getElementById('filter-status').addEventListener('change', updateList);
-        
+    
         document.getElementById('filter-fav').addEventListener('click', function() {
             showOnlyFavs = !showOnlyFavs;
             this.classList.toggle('bg-red-50');
@@ -165,6 +211,10 @@
             this.classList.toggle('border-red-200');
             updateList();
         });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => {});
+        }
 
         fetchMembers();
     </script>
