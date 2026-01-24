@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ほーむずマッチング</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+        
+        .heart-pop { animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-10">
+
+    <header class="bg-[#d9f99d] text-slate-700 p-5 shadow-sm sticky top-0 z-20 border-b border-[#bef264]">
+        <h1 class="text-xl font-bold text-center tracking-tight">ほーむずマッチング</h1>
+    </header>
+
+    <main id="app" class="p-4 max-w-md mx-auto">
+        
+        <div class="mb-6 space-y-3">
+            <div class="relative">
+                <input type="text" id="search-name" placeholder="名前やジャンルで検索..." 
+                       class="w-full p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-gray-700 text-base placeholder-gray-400">
+            </div>
+            
+            <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-hide">
+                <button id="filter-fav" class="bg-white border border-transparent shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-400 whitespace-nowrap transition-all">
+                    ❤️ お気に入り
+                </button>
+
+                <select id="filter-part" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
+                    <option value="">すべてのパート</option>
+                    <option value="Gt">Gt</option>
+                    <option value="Ba">Ba</option>
+                    <option value="Dr">Dr</option>
+                    <option value="Vo">Vo</option>
+                    <option value="Key">Key</option>
+                </select>
+
+                <select id="filter-status" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
+                    <option value="">すべての状態</option>
+                    <option value="募集中">メンバー募集中</option>
+                    <option value="セッション">セッションのみ</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="loading" class="text-center py-20 text-gray-400 font-medium">
+            <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-[#bef264] rounded-full mb-2"></div>
+            <p>読み込み中...</p>
+        </div>
+
+        <div id="member-list" class="grid gap-4"></div>
+    </main>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbz8uRbvgYokCEfeK5LajVDBuSNn6ZnfmL1ZuCaF44nTmQ7PfL4OFVdecrdTRwXO6_8Y/exec";
+        
+        let allMembers = [];
+        let favorites = JSON.parse(localStorage.getItem('homes_favs')) || [];
+        let showOnlyFavs = false;
+
+        async function fetchMembers() {
+            try {
+                const response = await fetch(API_URL);
+                allMembers = await response.json();
+                updateList(); 
+                document.getElementById('loading').classList.add('hidden');
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `<p>読み込みに失敗しました</p>`;
+            }
+        }
+
+        function toggleFavorite(id) {
+            const index = favorites.indexOf(id);
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('homes_favs', JSON.stringify(favorites));
+            updateList();
+        }
+
+        function updateList() {
+            const nameQuery = (document.getElementById('search-name').value || "").toLowerCase();
+            const partQuery = document.getElementById('filter-part').value;
+            const statusQuery = document.getElementById('filter-status').value;
+
+            const filtered = allMembers.filter(m => {
+                const isFav = favorites.includes(m.id);
+                const matchFav = !showOnlyFavs || isFav;
+                const matchName = (m.name || "").toLowerCase().includes(nameQuery) || 
+                                  (m.comment || "").toLowerCase().includes(nameQuery);
+                const matchPart = partQuery === "" || (m.part || "").includes(partQuery);
+                const matchStatus = statusQuery === "" || (m.status || "").includes(statusQuery);
+                return matchFav && matchName && matchPart && matchStatus;
+            });
+
+            renderMembers(filtered);
+        }
+
+        function renderMembers(members) {
+            const listContainer = document.getElementById('member-list');
+            listContainer.innerHTML = "";
+            
+            members.forEach((m, index) => {
+                const isFav = favorites.includes(m.id);
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-3xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] p-5 flex items-center space-x-4 relative border border-transparent animate-fadeIn";
+                
+                const iconUrl = m.id 
+                    ? `https://unavatar.io/twitter/${m.id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=f1f5f9&color=cbd5e1`
+                    : `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=f1f5f9&color=cbd5e1`;
+
+                card.innerHTML = `
+                    <div class="relative flex-shrink-0">
+                        <img src="${iconUrl}" class="w-16 h-16 rounded-full bg-slate-100 object-cover border-2 border-white" alt="">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <h2 class="font-bold text-slate-700 truncate text-base">${m.name}</h2>
+                            <button onclick="toggleFavorite('${m.id}')" class="p-1 focus:outline-none transition-transform active:scale-125">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ${isFav ? 'fill-red-500 text-red-500 heart-pop' : 'text-gray-300'}" fill="${isFav ? 'currentColor' : 'none'}" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-[#65a30d] text-[13px] font-bold mt-0.5">${m.part}</p>
+                        <p class="text-[11px] text-slate-400 mt-1 line-clamp-1 leading-relaxed">${m.comment || ''}</p>
+                        <div class="mt-4 flex items-center justify-between">
+                            <a href="https://twitter.com/${m.id}" target="_blank" class="text-[10px] font-bold bg-slate-700 text-white px-5 py-2 rounded-full hover:bg-slate-900 shadow-sm">X PROFILE</a>
+                            <span class="text-[10px] text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">${m.university || ''}</span>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.getElementById('search-name').addEventListener('input', updateList);
+        document.getElementById('filter-part').addEventListener('change', updateList);
+        document.getElementById('filter-status').addEventListener('change', updateList);
+        
+        document.getElementById('filter-fav').addEventListener('click', function() {
+            showOnlyFavs = !showOnlyFavs;
+            this.classList.toggle('bg-red-50');
+            this.classList.toggle('text-red-500');
+            this.classList.toggle('border-red-200');
+            updateList();
+        });
+
+        fetchMembers();
+    </script>
+</body>
+</html>
