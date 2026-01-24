@@ -1,42 +1,68 @@
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* パート別色分け */
+/* =========================
+   パート別色分け
+========================= */
 .part-tag-Gt { background-color: #fee2e2; color: #991b1b; }
 .part-tag-Ba { background-color: #dbeafe; color: #1e40af; }
 .part-tag-Dr { background-color: #fef3c7; color: #92400e; }
 .part-tag-Key { background-color: #f3e8ff; color: #6b21a8; }
 .part-tag-Vo { background-color: #dcfce7; color: #166534; }
 
-/* チップスタイル（パート・ステータス共通） */
-.part-chip.active, .status-chip.active {
+/* =========================
+   チップ（パート・ステータス）
+========================= */
+.part-chip.active,
+.status-chip.active {
     background-color: #bef264;
     color: #3f6212;
     border-color: #a3e635;
     transform: scale(1.05);
 }
 
-/* OB/OG用カード背景（落ち着いたグレー） */
+/* =========================
+   OB / OG カード
+========================= */
 .card-obog {
     background-color: #f1f5f9 !important;
     border: 1px solid #e2e8f0;
 }
 
-.is-fav { color: #f43f5e !important; }
+/* =========================
+   お気に入り
+========================= */
+.is-fav {
+    color: #f43f5e !important;
+}
 
-/* コメント詳細展開 */
+/* =========================
+   コメント展開
+========================= */
 .comment-area {
     max-height: 1.5rem;
     overflow: hidden;
     transition: max-height 0.4s ease;
 }
+
 .card-open .comment-area {
     max-height: 150px;
 }
 
+/* =========================
+   アニメーション
+========================= */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
 }
-.animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
-.fab-child-show { transform: translateY(0) scale(1) !important; opacity: 1 !important; }
+
+.animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* FAB 子要素表示 */
+.fab-child-show {
+    transform: translateY(0) scale(1) !important;
+    opacity: 1 !important;
+}
