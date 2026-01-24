@@ -13,9 +13,12 @@
     <meta property="og:description" content="バンドメンバー探しアプリ">
     <meta property="og:image" content="https://kmiyanaga96.github.io/homes-matching/homes-logo.png">
     <meta property="og:url" content="https://kmiyanaga96.github.io/homes-matching/">
-    <meta name="twitter:card" content="summary"> ```
+    <meta name="twitter:card" content="summary">
 
     <style>
+        body {
+            overscroll-behavior-y: contain;
+        }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -25,7 +28,6 @@
         }
         .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
         
-        /* ハートのアニメーション */
         .heart-pop { animation: heartPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes heartPop {
             0% { transform: scale(1); }
@@ -86,6 +88,11 @@
         <div id="loading" class="text-center py-20 text-gray-400 font-medium">
             <div class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-[#bef264] rounded-full mb-2"></div>
             <p>読み込み中...</p>
+        </div>
+
+        <div id="pull-indicator" class="flex flex-col items-center justify-center h-0 overflow-hidden transition-all duration-200 text-[#bef264]">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-current"></div>
+            <span class="text-[10px] font-bold mt-1 uppercase tracking-widest">Updating</span>
         </div>
 
         <div id="member-list" class="grid gap-4"></div>
@@ -217,6 +224,51 @@
         }
 
         fetchMembers();
+
+        let startY = 0;
+        const pullIndicator = document.getElementById('pull-indicator');
+        const PULL_THRESHOLD = 80;
+
+        window.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                startY = e.touches[0].pageY;
+            } else {
+                startY = null;
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (startY === null) return;
+    
+            const currentY = e.touches[0].pageY;
+            const diff = currentY - startY;
+
+            if (diff > 0 && window.scrollY === 0) {
+                const height = Math.min(diff, PULL_THRESHOLD + 20);
+                pullIndicator.style.height = `${height}px`;
+                pullIndicator.style.opacity = diff / PULL_THRESHOLD;
+        
+                if (diff > PULL_THRESHOLD) {
+                    pullIndicator.classList.add('text-lime-600');
+                } else {
+                    pullIndicator.classList.remove('text-lime-600');
+                }
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', async () => {
+            if (startY === null) return;
+    
+            const height = parseInt(pullIndicator.style.height);
+            if (height >= PULL_THRESHOLD) {
+                pullIndicator.style.height = '60px'; // 更新中の高さ
+                await fetchMembers(); // 既存のデータ取得関数を呼ぶ
+            }
+    
+            pullIndicator.style.height = '0px';
+            pullIndicator.style.opacity = '0';
+            startY = null;
+        });
     </script>
 </body>
 </html>
