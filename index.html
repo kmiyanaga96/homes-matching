@@ -6,82 +6,99 @@
     <title>ほーむずマッチング</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
 </head>
-<body class="bg-slate-50 min-h-screen pb-24 text-slate-900">
+<body class="bg-slate-50 min-h-screen pb-24 text-slate-900 overflow-x-hidden">
+
+    <div id="menu-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
 
     <header class="bg-[#d9f99d] text-slate-700 p-5 shadow-sm sticky top-0 z-20 border-b border-[#bef264]">
         <h1 class="text-xl font-bold text-center tracking-tight">ほーむずマッチング</h1>
     </header>
 
     <div id="loading" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50">
-        <div class="relative">
-            <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-b-[#bef264]"></div>
-        </div>
-        <p class="mt-4 text-slate-400 text-xs font-bold tracking-[0.2em] uppercase animate-pulse">Loading...</p>
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-b-[#bef264]"></div>
+        <p class="mt-4 text-slate-400 text-xs font-bold tracking-widest uppercase animate-pulse">Loading...</p>
     </div>
 
     <main id="app" class="p-4 max-w-md mx-auto">
         <div class="mb-6 space-y-3">
             <div class="relative">
-                <input type="text" id="search-name" placeholder="名前やコメントで検索..." 
-                    class="w-full p-4 pr-10 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-gray-700 text-base placeholder-gray-400">
-                <button id="clear-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                    </svg>
+                <input type="text" id="search-name" placeholder="名前やコメントで検索..." class="w-full p-4 pr-10 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-base">
+                <button id="clear-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
                 </button>
             </div>
             
             <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-hide">
-                <button id="filter-fav" class="bg-white border border-transparent shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-400 whitespace-nowrap transition-all">
-                    ❤️ お気に入り
-                </button>
-                <select id="filter-grade" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
+                <button id="filter-fav" class="bg-white border border-transparent shadow-sm rounded-xl px-4 py-2 text-sm font-medium text-gray-400 whitespace-nowrap transition-all">❤️ お気に入り</button>
+                <select id="filter-grade" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm text-gray-500">
                     <option value="">学年</option>
                     <option value="1">1年</option><option value="2">2年</option><option value="3">3年</option><option value="4">4年</option><option value="卒業生">卒業生</option>
                 </select>
-                <select id="filter-part" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
+                <select id="filter-part" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm text-gray-500">
                     <option value="">パート</option>
                     <option value="Gt">Gt</option><option value="Ba">Ba</option><option value="Dr">Dr</option><option value="Vo">Vo</option><option value="Key">Key</option>
                 </select>
-                <select id="filter-status" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm font-medium outline-none text-gray-500 focus:ring-2 focus:ring-[#bef264]">
+                <select id="filter-status" class="bg-white border-none shadow-sm rounded-xl px-4 py-2 text-sm text-gray-500">
                     <option value="">いつ組む？</option>
                     <option value="ミニライブ">ミニライブ</option><option value="定期ライブ">定期ライブ</option><option value="合宿">合宿</option><option value="非公式ライブ">非公式ライブ</option><option value="DMして">DMして</option><option value="むり">むり</option>
                 </select>
-                <button id="sort-btn" class="bg-white border border-slate-100 shadow-sm rounded-xl px-4 py-2 text-sm font-bold outline-none text-slate-500 whitespace-nowrap flex items-center space-x-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                    </svg>
-                    <span id="sort-label">更新順</span>
-                </button>
             </div>
         </div>
 
         <div id="member-list" class="grid gap-4"></div>
     </main>
 
-    <div id="detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
-        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-        <div id="modal-content" class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm z-10 overflow-hidden transform transition-all scale-95 opacity-0"></div>
+    <div id="edit-modal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onclick="closeEditModal()"></div>
+        <div id="edit-content" class="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl w-full max-w-md z-10 p-8 transform transition-all translate-y-full opacity-0 overflow-y-auto max-h-[90vh]">
+            <h3 class="text-xl font-extrabold text-slate-700 mb-6 flex items-center">
+                <span class="bg-[#d9f99d] w-2 h-6 rounded-full mr-3"></span>プロフィール編集 / 登録
+            </h3>
+            
+            <div class="mb-6">
+                <p class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-widest text-center">Preview</p>
+                <div id="edit-preview-card" class="bg-slate-50 p-2 rounded-3xl border border-slate-100"></div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="edit-name" placeholder="名前" class="p-3 bg-slate-50 rounded-xl border-none text-sm outline-none focus:ring-2 focus:ring-[#bef264]">
+                    <select id="edit-grade" class="p-3 bg-slate-50 rounded-xl border-none text-sm text-slate-600 outline-none">
+                        <option value="1">1年</option><option value="2">2年</option><option value="3">3年</option><option value="4">4年</option><option value="卒業生">卒業生</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="edit-part" placeholder="パート (例: Gt/Vo)" class="p-3 bg-slate-50 rounded-xl border-none text-sm outline-none focus:ring-2 focus:ring-[#bef264]">
+                    <select id="edit-status" class="p-3 bg-slate-50 rounded-xl border-none text-sm font-bold text-slate-600">
+                        <option value="ミニライブ">ミニライブ</option><option value="定期ライブ">定期ライブ</option><option value="合宿">合宿</option><option value="非公式ライブ">非公式ライブ</option><option value="DMして">DMして</option><option value="むり">むり</option>
+                    </select>
+                </div>
+                <textarea id="edit-comment" maxlength="100" class="w-full p-4 bg-slate-50 rounded-xl border-none text-sm outline-none focus:ring-2 focus:ring-[#bef264]" placeholder="意気込みや募集中の曲など..."></textarea>
+                
+                <div class="bg-slate-100 p-4 rounded-2xl space-y-3">
+                    <p class="text-[11px] font-bold text-slate-500">本人確認設定</p>
+                    <input type="text" id="edit-auth-id" placeholder="Twitter ID (@なし)" class="w-full p-3 bg-white rounded-xl border-none text-sm font-mono outline-none">
+                    <input type="password" id="edit-pass" placeholder="パスワード (4桁数字)" maxlength="4" class="w-full p-3 bg-white rounded-xl border-none text-sm outline-none">
+                </div>
+            </div>
+
+            <div class="mt-8 flex space-x-3">
+                <button onclick="closeEditModal()" class="flex-1 py-4 bg-slate-100 text-slate-400 font-bold rounded-2xl text-sm">戻る</button>
+                <button id="btn-finalize" onclick="handleFinalize()" class="flex-[2] py-4 bg-slate-800 text-white font-bold rounded-2xl text-sm shadow-lg active:scale-95 transition-transform">確定</button>
+            </div>
+        </div>
     </div>
 
-    <button id="back-to-top" class="fixed bottom-24 right-6 bg-white text-slate-400 w-14 h-14 rounded-full shadow-lg flex items-center justify-center opacity-0 translate-y-10 pointer-events-none transition-all duration-300 z-40 border-2 border-slate-50 active:scale-90">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-        </svg>
-    </button>
-
-    <button id="refresh-btn" class="fixed bottom-6 left-6 bg-white text-slate-400 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all z-40 border-2 border-slate-50 active:rotate-180 duration-500">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-    </button>
-
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeAn4-PCCxvCJxoHbXUDVCDMvl4m0ELLmURxCAjAE_SJoDKcQ/viewform" target="_blank" 
-       class="fixed bottom-6 right-6 bg-[#bef264] text-slate-700 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl hover:scale-110 transition-transform z-40 border-2 border-white">
-        <span class="mb-1">+</span>
-    </a>
+    <div class="fixed bottom-6 right-6 flex flex-col items-center z-50">
+        <button id="btn-login-open" class="mb-4 bg-white text-slate-600 w-12 h-12 rounded-full shadow-xl flex items-center justify-center transition-all scale-0 opacity-0 translate-y-10 border border-slate-100 group relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+            <span class="absolute right-16 bg-slate-800 text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 whitespace-nowrap">編集 / 登録</span>
+        </button>
+        <button id="fab-main" class="bg-[#bef264] text-slate-700 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-3xl transition-all duration-300 border-2 border-white">
+            <span id="fab-icon" class="mb-1 pointer-events-none">+</span>
+        </button>
+    </div>
 
     <script src="script.js"></script>
 </body>
