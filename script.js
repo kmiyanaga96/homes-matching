@@ -155,12 +155,14 @@ function applyFilterSheet() {
 
   document.getElementById("tab-search")?.addEventListener("click", () => goTab("search"));
   document.getElementById("tab-account")?.addEventListener("click", () => goTab("account"));
-
+  
   document.getElementById("btn-login-open")?.addEventListener("click", () => {
-    if (isLoggedIn) return;
-    openLoginModal();
+    if (!isLoggedIn) {
+      openLoginModal();
+      return;
+    }
+    switchTab("account");
   });
-
   document.getElementById("btn-login-cancel")?.addEventListener("click", closeLoginModal);
   document.getElementById("login-overlay")?.addEventListener("click", closeLoginModal);
   document.getElementById("btn-login-submit")?.addEventListener("click", performLogin);
@@ -178,10 +180,11 @@ function applyFilterSheet() {
   document.getElementById("edit-auth-id")?.addEventListener("input", updatePreview);
 
   function updateTopTabsVisibility() {
-    const tabs = document.getElementById("top-tabs");
-    if (!tabs) return;
-    tabs.classList.toggle("hidden", !isLoggedIn);
+    const el = document.getElementById("header-tabs");
+    if (!el) return;
+    el.classList.toggle("hidden", !isLoggedIn);
   }
+
 
   function applyTabUI(tab) {
     const panelSearch = document.getElementById("panel-search");
