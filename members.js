@@ -124,8 +124,10 @@ function renderMembers(displayList) {
         </div>
 
         <div class="mt-3 flex justify-between items-center border-t border-slate-50 pt-3">
-          <a href="https://twitter.com/${m.id}" target="_blank"
-             class="text-sky-500 text-[10px] font-bold">@${m.id || ""}</a>
+          <a href="https://twitter.com/${m.id}" target="_blank" rel="noopener"
+            class="inline-flex items-center justify-center bg-slate-900 text-white text-[11px] font-extrabold px-4 py-2 rounded-full border border-slate-900 shadow-sm hover:bg-white hover:text-slate-900 hover:border-slate-300 transition">
+          X
+          </a>
         </div>
       </div>
     `;
