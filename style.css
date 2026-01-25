@@ -66,3 +66,53 @@
     transform: translateY(0) scale(1) !important;
     opacity: 1 !important;
 }
+
+/* =========================
+   Notice icon (modern)
+========================= */
+.notice-icon{
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+}
+
+.notice-svg{
+    width: 22px;
+    height: 22px;
+    color: #334155; /* slate-700 */
+}
+
+#btn-notice{
+    border-radius: 9999px;
+    transition: transform .12s ease, background-color .12s ease;
+}
+
+#btn-notice:active{
+    transform: scale(0.96);
+}
+
+/* X button */
+.x-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  background: #f1f5f9;        /* 薄いグレー */
+  transition: all 0.15s ease;
+}
+
+.x-btn:hover {
+  background: #e5e7eb;
+  transform: scale(1.05);
+}
+
+.x-icon {
+  width: 14px;
+  height: 14px;
+  fill: #0f172a;              /* 黒だけど純黒じゃない */
+}
