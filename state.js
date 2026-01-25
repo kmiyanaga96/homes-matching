@@ -69,7 +69,7 @@ function updatedAtToTime(m) {
 let authId = localStorage.getItem("auth_id") || "";
 let authPass = localStorage.getItem("auth_pass") || "";
 
-function isLoggedIn() {
+function hasAuth() {
   return !!authId && !!authPass;
 }
 

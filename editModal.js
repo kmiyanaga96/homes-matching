@@ -146,7 +146,7 @@ function bindAccountChips() {
 }
 
 async function saveAccount() {
-  if (!isLoggedIn()) {
+  if (!hasAuth()) {
     alert("ログインしてください");
     return;
   }
