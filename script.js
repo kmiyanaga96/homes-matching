@@ -116,12 +116,8 @@ function applyFilterSheet() {
    Boot (split files entry)
 ========================= */
 (() => {
-  // 二重起動防止（複数回読み込み・再実行対策）
   if (window.__homesBooted) return;
   window.__homesBooted = true;
-
-  // 既存の inline onclick が生きるように、必要な関数だけ window に生やす
-  // （既にwindowにあるなら上書きされるだけで問題なし）
   window.applyFilters = window.applyFilters || applyFilters;
   window.toggleFavFilter = window.toggleFavFilter || toggleFavFilter;
   window.toggleFavorite = window.toggleFavorite || toggleFavorite;
@@ -137,7 +133,6 @@ function applyFilterSheet() {
   window.openNoticeModal = window.openNoticeModal || openNoticeModal;
   window.closeNoticeModal = window.closeNoticeModal || closeNoticeModal;
 
-  // イベント登録（分割でどこかに消えた可能性があるので、ここで確実に）
   document.getElementById("search-name")?.addEventListener("input", applyFilters);
   document.getElementById("fab-main")?.addEventListener("click", toggleMenu);
   document.getElementById("btn-login-open")?.addEventListener("click", openEditModal);
@@ -158,7 +153,6 @@ function applyFilterSheet() {
 
   document.getElementById("edit-auth-id")?.addEventListener("input", updatePreview);
 
-  // 初期ロード（分割で呼ばれなくなりがち）
   fetchMembers();
   fetchNotices();
 })();
