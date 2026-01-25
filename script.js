@@ -187,24 +187,26 @@ function applyFilterSheet() {
 
 
   function applyTabUI(tab) {
-    const panelSearch = document.getElementById("panel-search");
-    const panelAccount = document.getElementById("panel-account");
-    const btnSearch = document.getElementById("tab-search");
-    const btnAccount = document.getElementById("tab-account");
+    const tSearch = document.getElementById("tab-search");
+    const tAccount = document.getElementById("tab-account");
 
-    if (panelSearch) panelSearch.classList.toggle("hidden", tab !== "search");
-    if (panelAccount) panelAccount.classList.toggle("hidden", tab !== "account");
+    const vSearch = document.getElementById("view-search");
+    const vAccount = document.getElementById("view-account");
 
-    if (btnSearch) {
-      btnSearch.classList.toggle("bg-slate-800", tab === "search");
-      btnSearch.classList.toggle("text-white", tab === "search");
-      btnSearch.classList.toggle("text-slate-700", tab !== "search");
-    }
-    if (btnAccount) {
-      btnAccount.classList.toggle("bg-slate-800", tab === "account");
-      btnAccount.classList.toggle("text-white", tab === "account");
-      btnAccount.classList.toggle("text-slate-500", tab !== "account");
-    }
+    const isSearch = tab === "search";
+
+    tSearch?.classList.toggle("bg-slate-800", isSearch);
+    tSearch?.classList.toggle("text-white", isSearch);
+    tSearch?.classList.toggle("bg-slate-100", !isSearch);
+    tSearch?.classList.toggle("text-slate-500", !isSearch);
+
+    tAccount?.classList.toggle("bg-slate-800", !isSearch);
+    tAccount?.classList.toggle("text-white", !isSearch);
+    tAccount?.classList.toggle("bg-slate-100", isSearch);
+    tAccount?.classList.toggle("text-slate-500", isSearch);
+
+    vSearch?.classList.toggle("hidden", !isSearch);
+    vAccount?.classList.toggle("hidden", isSearch);
   }
 
   function goTab(tab) {
