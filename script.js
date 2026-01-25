@@ -111,3 +111,54 @@ function applyFilterSheet() {
   applyFilters();
   closeFilterSheet();
 }
+
+/* =========================
+   Boot (split files entry)
+========================= */
+(() => {
+  // 二重起動防止（複数回読み込み・再実行対策）
+  if (window.__homesBooted) return;
+  window.__homesBooted = true;
+
+  // 既存の inline onclick が生きるように、必要な関数だけ window に生やす
+  // （既にwindowにあるなら上書きされるだけで問題なし）
+  window.applyFilters = window.applyFilters || applyFilters;
+  window.toggleFavFilter = window.toggleFavFilter || toggleFavFilter;
+  window.toggleFavorite = window.toggleFavorite || toggleFavorite;
+  window.toggleCard = window.toggleCard || toggleCard;
+  window.toggleMenu = window.toggleMenu || toggleMenu;
+
+  window.openEditModal = window.openEditModal || openEditModal;
+  window.closeEditModal = window.closeEditModal || closeEditModal;
+  window.handleFinalize = window.handleFinalize || handleFinalize;
+  window.togglePart = window.togglePart || togglePart;
+  window.toggleStatusChip = window.toggleStatusChip || toggleStatusChip;
+
+  window.openNoticeModal = window.openNoticeModal || openNoticeModal;
+  window.closeNoticeModal = window.closeNoticeModal || closeNoticeModal;
+
+  // イベント登録（分割でどこかに消えた可能性があるので、ここで確実に）
+  document.getElementById("search-name")?.addEventListener("input", applyFilters);
+  document.getElementById("fab-main")?.addEventListener("click", toggleMenu);
+  document.getElementById("btn-login-open")?.addEventListener("click", openEditModal);
+
+  document.getElementById("refresh-btn")?.addEventListener("click", () => {
+    fetchMembers();
+    fetchNotices();
+  });
+
+  document.getElementById("btn-notice")?.addEventListener("click", openNoticeModal);
+  document.getElementById("btn-notice-close")?.addEventListener("click", closeNoticeModal);
+
+  const noticeModal = document.getElementById("notice-modal");
+  if (noticeModal) {
+    const overlay = noticeModal.querySelector(":scope > div.absolute");
+    overlay?.addEventListener("click", closeNoticeModal);
+  }
+
+  document.getElementById("edit-auth-id")?.addEventListener("input", updatePreview);
+
+  // 初期ロード（分割で呼ばれなくなりがち）
+  fetchMembers();
+  fetchNotices();
+})();
