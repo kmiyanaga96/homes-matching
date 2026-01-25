@@ -116,3 +116,37 @@
   height: 14px;
   fill: #0f172a;              /* 黒だけど純黒じゃない */
 }
+
+/* =========================
+   Timeline-like Header Tabs
+========================= */
+.timeline-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.15); /* slate-900の薄め */
+}
+
+.timeline-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 0;
+  color: rgba(15, 23, 42, 0.55);
+  font-weight: 800;
+  font-size: 12px;
+  border-bottom: 2px solid transparent;
+  transform: translateY(1px); /* 下線を“ヘッダー境界”に寄せる */
+}
+
+.timeline-tab.is-active {
+  color: rgba(15, 23, 42, 0.95);
+  border-bottom-color: rgba(15, 23, 42, 0.95);
+}
+
+.timeline-tab-label {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}

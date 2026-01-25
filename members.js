@@ -91,7 +91,7 @@ function renderMembers(displayList) {
     const statusDisplay = (m.status || "").split("/").filter(Boolean).join(", ");
 
     const cardHTML = `
-      <div id="card-${m.id}" class="bg-white rounded-[2rem] shadow-sm p-5 animate-fadeIn ${obogClass}" style="animation-delay:${i * 0.02}s">
+      <div id="card-${m.id}" class="bg-white rounded-[2rem] shadow-sm pt-5 px-5 pb-3 animate-fadeIn ${obogClass}" style="animation-delay:${i * 0.02}s">
         <div class="flex items-start justify-between">
           <div class="flex items-center space-x-4 flex-1">
             <img src="https://unavatar.io/twitter/${m.id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(m.name || "")}"
@@ -123,10 +123,10 @@ function renderMembers(displayList) {
           </div>
         </div>
 
-        <div class="mt-3 flex justify-between items-center border-t border-slate-50 pt-3">
-          <a href="https://twitter.com/${m.id}" target="_blank" class="x-btn">
-            <svg viewBox="0 0 24 24" class="x-icon" aria-hidden="true">
-              <path d="M18.244 2H21l-6.518 7.455L22 22h-6.889l-4.52-5.92L5.56 22H3l7.01-8.02L2 2h7.03l4.087 5.388L18.244 2zm-1.207 18h1.91L8.12 4H6.07l10.967 16z"/>
+        <div class="mt-2 flex justify-end items-center border-t border-slate-50 pt-2">
+          <a href="https://twitter.com/${m.id}" target="_blank" rel="noopener noreferrer" class="x-btn" aria-label="X profile" title="X">
+            <svg class="x-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18.9 2H22l-6.7 7.7L23 22h-6.8l-5.3-6.9L4.9 22H2l7.2-8.3L1 2h7l4.8 6.3L18.9 2z"></path>
             </svg>
           </a>
         </div>

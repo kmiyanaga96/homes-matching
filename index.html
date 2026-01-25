@@ -15,43 +15,47 @@
 
     <!-- header -->
     <header class="bg-[#d9f99d] text-slate-700 p-5 shadow-sm sticky top-0 z-20 border-b border-[#bef264]">
-        <div class="relative flex items-center justify-center">
-            <h1 class="text-xl font-bold tracking-tight text-slate-800">
-                ほーむずマッチング
-            </h1>
+        <div class="max-w-md mx-auto">
+            <!-- title row -->
+            <div class="relative flex items-center justify-center">
+                <h1 class="text-xl font-bold tracking-tight text-slate-800">
+                    ほーむずマッチング
+                </h1>
 
-            <!-- notification button -->
-            <button id="btn-notice" data-open="false" class="absolute right-0 top-1/2 -translate-y-1/2 mr-1 p-2 text-slate-600">
-                <span class="notice-icon">
-                    <svg class="notice-svg" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z"
-                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-                    </svg>
-                    <span id="notice-dot"
-                        class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full hidden"></span>
-                </span>
-            </button>
+                <!-- notification button -->
+                <button id="btn-notice" data-open="false" class="absolute right-0 top-1/2 -translate-y-1/2 mr-1 p-2 text-slate-600">
+                    <span class="notice-icon">
+                        <svg class="notice-svg" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                        </svg>
+                        <span id="notice-dot" class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                    </span>
+                </button>
+            </div>
 
-            <!-- tabs -->
+            <!-- tabs row -->
             <div id="header-tabs" class="mt-3 hidden">
-                <div class="grid grid-cols-2 bg-white/60 rounded-xl p-1 border border-[#bef264]">
-                    <button id="tab-search" class="py-2 rounded-lg text-xs font-bold bg-slate-800 text-white flex items-center justify-center" aria-label="検索">
+                <div class="timeline-tabs">
+                    <button id="tab-search" class="timeline-tab is-active" aria-label="検索">
                         <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M20 20l-3.5-3.5"></path>
                             <circle cx="11" cy="11" r="7"></circle>
                         </svg>
+                        <span class="timeline-tab-label">検索</span>
                     </button>
 
-                    <button id="tab-account" class="py-2 rounded-lg text-xs font-bold bg-transparent text-slate-600 flex items-center justify-center" aria-label="アカウント">
+                    <button id="tab-account" class="timeline-tab" aria-label="アカウント">
                         <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M20 21a8 8 0 0 0-16 0"></path>
                             <circle cx="12" cy="9" r="4"></circle>
                         </svg>
+                        <span class="timeline-tab-label">アカウント</span>
                     </button>
                 </div>
             </div>
         </div>
     </header>
+
 
     <!-- loading -->
     <div id="loading" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm hidden">
