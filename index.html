@@ -44,43 +44,26 @@
             <input type="text" id="search-name" placeholder="名前で検索..."
                 class="w-full p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-base">
 
-            <div class="flex space-x-2 overflow-x-auto pb-1 scrollbar-hide">
-                <button id="filter-fav" onclick="toggleFavFilter()"
-                    class="bg-white shadow-sm rounded-xl px-4 py-2 text-sm text-gray-400 border border-transparent transition-all whitespace-nowrap">
-                    <span id="fav-filter-icon">🤍</span> お気に入り
-                </button>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <button id="btn-filter"
+                        class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100"
+                        aria-label="フィルタ">
+                        ⚙️ フィルタ
+                    </button>
 
-                <select id="filter-part" onchange="applyFilters()"
-                    class="bg-white shadow-sm rounded-xl px-3 py-2 text-xs text-gray-500 border-none outline-none">
-                    <option value="">パート</option>
-                    <option value="Gt">Gt</option>
-                    <option value="Ba">Ba</option>
-                    <option value="Dr">Dr</option>
-                    <option value="Key">Key</option>
-                    <option value="Vo">Vo</option>
-                </select>
+                    <button id="btn-sort"
+                        class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100"
+                        aria-label="並び替え">
+                        ⇅ 並び替え
+                    </button>
+                </div>
 
-                <select id="filter-grade" onchange="applyFilters()"
-                    class="bg-white shadow-sm rounded-xl px-3 py-2 text-xs text-gray-500 border-none outline-none">
-                    <option value="">学年</option>
-                    <option value="1">1年</option>
-                    <option value="2">2年</option>
-                    <option value="3">3年</option>
-                    <option value="4">4年</option>
-                    <option value="OB/OG">OB/OG</option>
-                </select>
-
-                <select id="filter-status" onchange="applyFilters()"
-                    class="bg-white shadow-sm rounded-xl px-3 py-2 text-xs text-gray-500 border-none outline-none">
-                    <option value="">次いつ組む？</option>
-                    <option value="ミニライブ">ミニライブ</option>
-                    <option value="定期ライブ">定期ライブ</option>
-                    <option value="合宿">合宿</option>
-                    <option value="非公式ライブ">非公式ライブ</option>
-                    <option value="DMして">DMして</option>
-                    <option value="むり">むり</option>
-                </select>
+                <span id="active-filter-hint"
+                    class="text-[10px] font-bold text-slate-400">
+                </span>
             </div>
+
         </div>
 
         <div id="member-list" class="grid gap-3"></div>
@@ -110,6 +93,99 @@
             </div>
         </div>
     </div>
+
+    <!-- Filter / Sort Modal -->
+    <div id="filter-modal" class="fixed inset-0 z-[75] flex items-end justify-center hidden">
+        <div id="filter-overlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+
+        <div id="filter-content"
+            class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl z-10
+                   transform translate-y-full transition-all duration-300">
+
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-bold text-slate-700 flex items-center">
+                    <span class="bg-[#bef264] w-1.5 h-4 rounded-full mr-2"></span>
+                    絞り込み / 並び替え
+                </h3>
+                <button id="btn-filter-close" class="text-slate-400 text-lg font-bold">✕</button>
+            </div>
+
+            <!-- tabs -->
+            <div class="flex gap-2 mb-4">
+                <button id="tab-filter"
+                    class="flex-1 py-2 rounded-xl text-xs font-bold bg-slate-800 text-white">
+                    フィルタ
+                </button>
+                <button id="tab-sort"
+                    class="flex-1 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500">
+                    並び替え
+                </button>
+            </div>
+
+            <!-- Filter Panel -->
+            <div id="panel-filter" class="space-y-3">
+                <button id="filter-fav"
+                    class="w-full bg-white shadow-sm rounded-xl px-4 py-3 text-sm text-gray-400 border border-slate-100 transition-all whitespace-nowrap flex items-center justify-center gap-2">
+                    <span id="fav-filter-icon">🤍</span> お気に入り
+                </button>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <select id="filter-part"
+                        class="bg-slate-50 shadow-sm rounded-xl px-3 py-3 text-xs text-gray-500 border-none outline-none">
+                        <option value="">パート</option>
+                        <option value="Gt">Gt</option>
+                        <option value="Ba">Ba</option>
+                        <option value="Dr">Dr</option>
+                        <option value="Key">Key</option>
+                        <option value="Vo">Vo</option>
+                    </select>
+
+                    <select id="filter-grade"
+                        class="bg-slate-50 shadow-sm rounded-xl px-3 py-3 text-xs text-gray-500 border-none outline-none">
+                        <option value="">学年</option>
+                        <option value="1">1年</option>
+                        <option value="2">2年</option>
+                        <option value="3">3年</option>
+                        <option value="4">4年</option>
+                        <option value="OB/OG">OB/OG</option>
+                    </select>
+
+                    <select id="filter-status"
+                        class="bg-slate-50 shadow-sm rounded-xl px-3 py-3 text-xs text-gray-500 border-none outline-none">
+                        <option value="">次いつ組む？</option>
+                        <option value="ミニライブ">ミニライブ</option>
+                        <option value="定期ライブ">定期ライブ</option>
+                        <option value="合宿">合宿</option>
+                        <option value="非公式ライブ">非公式ライブ</option>
+                        <option value="DMして">DMして</option>
+                        <option value="むり">むり</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sort Panel -->
+            <div id="panel-sort" class="space-y-3 hidden">
+                <select id="sort-mode"
+                    class="w-full bg-slate-50 shadow-sm rounded-xl px-3 py-3 text-xs text-gray-500 border-none outline-none">
+                    <option value="updatedDesc">最終更新順</option>
+                    <option value="gradeAsc">学年（昇順）</option>
+                    <option value="gradeDesc">学年（降順）</option>
+                </select>
+            </div>
+
+            <div class="mt-5 flex gap-2">
+                <button id="btn-filter-reset"
+                    class="flex-1 py-3 bg-slate-100 text-slate-400 font-bold rounded-xl text-[11px]">
+                    リセット
+                </button>
+                <button id="btn-filter-apply"
+                    class="flex-[1.5] py-3 bg-slate-800 text-white font-bold rounded-xl text-[11px] shadow-lg">
+                    適用
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- edit modal（既存） -->
     <div id="edit-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">

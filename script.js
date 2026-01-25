@@ -7,6 +7,7 @@ let allMembers = [];
 let favorites = JSON.parse(localStorage.getItem("fav_members") || "[]");
 let isMenuOpen = false;
 let isFavFilterActive = false;
+let sortMode = localStorage.getItem("sort_mode") || "updatedDesc";
 
 let notices = [];
 let lastSeenNoticeAt = localStorage.getItem("notice_last_seen_at"); // ISO文字列
@@ -18,10 +19,12 @@ function toIsoStringSafe(d) {
   const dt = d instanceof Date ? d : new Date(d);
   return isNaN(dt.getTime()) ? "" : dt.toISOString();
 }
+
 function toDateSafe(d) {
   const dt = d instanceof Date ? d : new Date(d);
   return isNaN(dt.getTime()) ? null : dt;
 }
+
 function isUnreadNotice(n) {
   const created = toDateSafe(n.createdAt);
   if (!created) return false;
@@ -30,6 +33,31 @@ function isUnreadNotice(n) {
   if (!seen) return true;
   return created > seen;
 }
+
+function gradeToNumber(g) {
+  // "OB/OG" は 5年扱い、それ以外は数値化
+  if (String(g).trim() === "OB/OG") return 5;
+  const n = Number(g);
+  return Number.isFinite(n) ? n : 999;
+}
+
+const PART_ORDER = ["Vo", "Gt", "Key", "Ba", "Dr"];
+function partRank(partStr) {
+  // 複数パートの時は「一番上位のパート」を代表として使う
+  const parts = String(partStr || "").split("/").filter(Boolean);
+  let best = 999;
+  parts.forEach((p) => {
+    const idx = PART_ORDER.indexOf(p);
+    if (idx !== -1) best = Math.min(best, idx);
+  });
+  return best;
+}
+
+function updatedAtToTime(m) {
+  const d = toDateSafe(m.updatedAt);
+  return d ? d.getTime() : 0;
+}
+
 
 /* =========================
    Members: Fetch
@@ -53,10 +81,10 @@ async function fetchMembers() {
    Members: Filter
 ========================= */
 function applyFilters() {
-  const nameVal = document.getElementById("search-name").value.toLowerCase();
-  const partVal = document.getElementById("filter-part").value;
-  const gradeVal = document.getElementById("filter-grade").value;
-  const statusVal = document.getElementById("filter-status").value;
+  const nameVal = (document.getElementById("search-name")?.value || "").toLowerCase();
+  const partVal = document.getElementById("filter-part")?.value || "";
+  const gradeVal = document.getElementById("filter-grade")?.value || "";
+  const statusVal = document.getElementById("filter-status")?.value || "";
 
   const filtered = allMembers.filter((m) => {
     const matchName = (m.name || "").toLowerCase().includes(nameVal);
@@ -67,7 +95,41 @@ function applyFilters() {
     return matchName && matchPart && matchGrade && matchStatus && matchFav;
   });
 
-  renderMembers(filtered);
+  // --- sort ---
+  const sorted = filtered.slice().sort((a, b) => {
+    if (sortMode === "updatedDesc") {
+      const ta = updatedAtToTime(a);
+      const tb = updatedAtToTime(b);
+      if (tb !== ta) return tb - ta;
+
+      // 同時刻の場合：学年→パート→名前
+      const ga = gradeToNumber(a.grade);
+      const gb = gradeToNumber(b.grade);
+      if (ga !== gb) return ga - gb;
+
+      const pa = partRank(a.part);
+      const pb = partRank(b.part);
+      if (pa !== pb) return pa - pb;
+
+      return String(a.name || "").localeCompare(String(b.name || ""), "ja");
+    }
+
+    const ga = gradeToNumber(a.grade);
+    const gb = gradeToNumber(b.grade);
+    if (ga !== gb) {
+      return sortMode === "gradeAsc" ? ga - gb : gb - ga;
+    }
+
+    // 同学年：パート順（Vo→Gt→Key→Ba→Dr）
+    const pa = partRank(a.part);
+    const pb = partRank(b.part);
+    if (pa !== pb) return pa - pb;
+
+    // 最後に名前で安定化
+    return String(a.name || "").localeCompare(String(b.name || ""), "ja");
+  });
+
+  renderMembers(sorted);
 }
 
 /* =========================
@@ -161,12 +223,15 @@ function toggleFavFilter() {
   if (btn) {
     btn.classList.toggle("text-rose-500", isFavFilterActive);
     btn.classList.toggle("border-rose-100", isFavFilterActive);
+    btn.classList.toggle("text-gray-400", !isFavFilterActive);
   }
+
   const icon = document.getElementById("fav-filter-icon");
   if (icon) icon.innerText = isFavFilterActive ? "❤️" : "🤍";
 
   applyFilters();
 }
+
 
 /* =========================
    Edit Modal (Members)
@@ -419,6 +484,100 @@ function closeNoticeModal() {
 }
 
 /* =========================
+   Filter / Sort Bottom Sheet
+========================= */
+function openFilterSheet(initialTab) {
+  const modal = document.getElementById("filter-modal");
+  const content = document.getElementById("filter-content");
+  if (!modal || !content) return;
+
+  // 初期タブ
+  setFilterSheetTab(initialTab || "filter");
+
+  // sort-mode 初期値を反映
+  const sortSelect = document.getElementById("sort-mode");
+  if (sortSelect) sortSelect.value = sortMode;
+
+  modal.classList.remove("hidden");
+  setTimeout(() => {
+    content.classList.remove("translate-y-full");
+  }, 10);
+}
+
+function closeFilterSheet() {
+  const modal = document.getElementById("filter-modal");
+  const content = document.getElementById("filter-content");
+  if (!modal || !content) return;
+
+  content.classList.add("translate-y-full");
+  setTimeout(() => modal.classList.add("hidden"), 300);
+}
+
+function setFilterSheetTab(tab) {
+  const tabFilter = document.getElementById("tab-filter");
+  const tabSort = document.getElementById("tab-sort");
+  const panelFilter = document.getElementById("panel-filter");
+  const panelSort = document.getElementById("panel-sort");
+
+  if (!tabFilter || !tabSort || !panelFilter || !panelSort) return;
+
+  const isFilter = tab === "filter";
+
+  tabFilter.classList.toggle("bg-slate-800", isFilter);
+  tabFilter.classList.toggle("text-white", isFilter);
+  tabFilter.classList.toggle("bg-slate-100", !isFilter);
+  tabFilter.classList.toggle("text-slate-500", !isFilter);
+
+  tabSort.classList.toggle("bg-slate-800", !isFilter);
+  tabSort.classList.toggle("text-white", !isFilter);
+  tabSort.classList.toggle("bg-slate-100", isFilter);
+  tabSort.classList.toggle("text-slate-500", isFilter);
+
+  panelFilter.classList.toggle("hidden", !isFilter);
+  panelSort.classList.toggle("hidden", isFilter);
+}
+
+function resetFilterSheet() {
+  // fav
+  isFavFilterActive = false;
+  const favIcon = document.getElementById("fav-filter-icon");
+  const favBtn = document.getElementById("filter-fav");
+  if (favIcon) favIcon.innerText = "🤍";
+  if (favBtn) {
+    favBtn.classList.remove("text-rose-500", "border-rose-100");
+    favBtn.classList.add("text-gray-400");
+  }
+
+  // selects
+  const part = document.getElementById("filter-part");
+  const grade = document.getElementById("filter-grade");
+  const status = document.getElementById("filter-status");
+  if (part) part.value = "";
+  if (grade) grade.value = "";
+  if (status) status.value = "";
+
+  // sort
+  sortMode = "updatedDesc";
+  localStorage.setItem("sort_mode", sortMode);
+  const sortSelect = document.getElementById("sort-mode");
+  if (sortSelect) sortSelect.value = sortMode;
+
+  applyFilters();
+}
+
+function applyFilterSheet() {
+  // sort
+  const sortSelect = document.getElementById("sort-mode");
+  if (sortSelect) {
+    sortMode = sortSelect.value || "updatedDesc";
+    localStorage.setItem("sort_mode", sortMode);
+  }
+
+  applyFilters();
+  closeFilterSheet();
+}
+
+/* =========================
    Events / Init
 ========================= */
 document.getElementById("search-name")?.addEventListener("input", applyFilters);
@@ -431,6 +590,20 @@ document.getElementById("refresh-btn")?.addEventListener("click", () => {
 
 document.getElementById("btn-notice")?.addEventListener("click", openNoticeModal);
 document.getElementById("btn-notice-close")?.addEventListener("click", closeNoticeModal);
+
+document.getElementById("btn-filter")?.addEventListener("click", () => openFilterSheet("filter"));
+document.getElementById("btn-sort")?.addEventListener("click", () => openFilterSheet("sort"));
+
+document.getElementById("btn-filter-close")?.addEventListener("click", closeFilterSheet);
+document.getElementById("filter-overlay")?.addEventListener("click", closeFilterSheet);
+
+document.getElementById("tab-filter")?.addEventListener("click", () => setFilterSheetTab("filter"));
+document.getElementById("tab-sort")?.addEventListener("click", () => setFilterSheetTab("sort"));
+
+document.getElementById("btn-filter-reset")?.addEventListener("click", resetFilterSheet);
+document.getElementById("btn-filter-apply")?.addEventListener("click", applyFilterSheet);
+
+document.getElementById("filter-fav")?.addEventListener("click", toggleFavFilter);
 
 const noticeModal = document.getElementById("notice-modal");
 if (noticeModal) {
