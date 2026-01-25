@@ -137,6 +137,27 @@ function applyFilterSheet() {
   document.getElementById("fab-main")?.addEventListener("click", toggleMenu);
   document.getElementById("btn-login-open")?.addEventListener("click", openEditModal);
 
+  window.openFilterSheet = window.openFilterSheet || openFilterSheet;
+  window.closeFilterSheet = window.closeFilterSheet || closeFilterSheet;
+  window.setFilterSheetTab = window.setFilterSheetTab || setFilterSheetTab;
+  window.resetFilterSheet = window.resetFilterSheet || resetFilterSheet;
+  window.applyFilterSheet = window.applyFilterSheet || applyFilterSheet;
+
+  document.getElementById("btn-filter")?.addEventListener("click", () => openFilterSheet("filter"));
+  document.getElementById("btn-sort")?.addEventListener("click", () => openFilterSheet("sort"));
+
+  document.getElementById("btn-filter-close")?.addEventListener("click", closeFilterSheet);
+  document.getElementById("filter-overlay")?.addEventListener("click", closeFilterSheet);
+
+  document.getElementById("tab-filter")?.addEventListener("click", () => setFilterSheetTab("filter"));
+  document.getElementById("tab-sort")?.addEventListener("click", () => setFilterSheetTab("sort"));
+
+  document.getElementById("btn-filter-reset")?.addEventListener("click", resetFilterSheet);
+  document.getElementById("btn-filter-apply")?.addEventListener("click", applyFilterSheet);
+
+  document.getElementById("filter-fav")?.addEventListener("click", toggleFavFilter);
+
+
   document.getElementById("refresh-btn")?.addEventListener("click", () => {
     fetchMembers();
     fetchNotices();
