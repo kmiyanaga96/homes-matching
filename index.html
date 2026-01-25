@@ -21,9 +21,7 @@
             </h1>
 
             <!-- notification button -->
-            <button id="btn-notice"
-                data-open="false"
-                class="absolute right-0 top-1/2 -translate-y-1/2 mr-1 p-2 text-slate-600">
+            <button id="btn-notice" data-open="false" class="absolute right-0 top-1/2 -translate-y-1/2 mr-1 p-2 text-slate-600">
                 <span class="notice-icon">
                     <svg class="notice-svg" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z"
@@ -33,6 +31,25 @@
                         class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full hidden"></span>
                 </span>
             </button>
+
+            <!-- tabs -->
+            <div id="header-tabs" class="mt-3 hidden">
+                <div class="grid grid-cols-2 bg-white/60 rounded-xl p-1 border border-[#bef264]">
+                    <button id="tab-search" class="py-2 rounded-lg text-xs font-bold bg-slate-800 text-white flex items-center justify-center" aria-label="検索">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20 20l-3.5-3.5"></path>
+                            <circle cx="11" cy="11" r="7"></circle>
+                        </svg>
+                    </button>
+
+                    <button id="tab-account" class="py-2 rounded-lg text-xs font-bold bg-transparent text-slate-600 flex items-center justify-center" aria-label="アカウント">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M20 21a8 8 0 0 0-16 0"></path>
+                            <circle cx="12" cy="9" r="4"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -43,44 +60,134 @@
 
     <!-- main -->
     <main id="app" class="p-4 max-w-md mx-auto">
-        <div class="mb-6 space-y-3">
-            <input type="text" id="search-name" placeholder="名前で検索..."
-                class="w-full p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-base">
 
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <button id="btn-filter"
-                        class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100"
-                        aria-label="フィルタ">
-                        <span class="inline-flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 text-slate-600">
-                                <path fill="currentColor" d="M3 5h18v2H3V5Zm4 6h10v2H7v-2Zm3 6h4v2h-4v-2Z"/>
-                            </svg>
-                            <span>フィルタ</span>
-                        </span>
-                    </button>
+        <!-- Search View -->
+        <section id="panel-search">
+            <div class="mb-6 space-y-3">
+                <input type="text" id="search-name" placeholder="名前で検索..." class="w-full p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-base">
 
-                    <button id="btn-sort"
-                        class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100"
-                        aria-label="並び替え">
-                        <span class="inline-flex items-center gap-1.5">
-                            <svg viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 text-slate-600">
-                                <path fill="currentColor" d="M7 3 3 7h3v12h2V7h3L7 3Zm10 18 4-4h-3V5h-2v12h-3l4 4Z"/>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <button id="btn-filter" class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100 flex items-center justify-center" aria-label="フィルタ">
+                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M4 6h16"></path>
+                                <path d="M7 6v0"></path>
+                                <circle cx="7" cy="6" r="2"></circle>
+                                <path d="M4 12h16"></path>
+                                <circle cx="14" cy="12" r="2"></circle>
+                                <path d="M4 18h16"></path>
+                                <circle cx="9" cy="18" r="2"></circle>
                             </svg>
-                            <span>並び替え</span>
-                        </span>
-                    </button>
+                        </button>
+
+                        <button id="btn-sort" class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100 flex items-center justify-center" aria-label="並び替え">
+                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M8 7l4-4 4 4"></path>
+                                <path d="M12 3v14"></path>
+                                <path d="M16 17l-4 4-4-4"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <span id="active-filter-hint" class="text-[10px] font-bold text-slate-400"></span>
                 </div>
-
-                <span id="active-filter-hint"
-                    class="text-[10px] font-bold text-slate-400">
-                </span>
             </div>
 
-        </div>
+            <div id="member-list" class="grid gap-3"></div>
+        </section>
 
-        <div id="member-list" class="grid gap-3"></div>
+        <section id="panel-account" class="hidden">
+            <div id="account-root"></div>
+        </section>
+
+        <!-- Account View -->
+        <section id="view-account" class="hidden">
+            <div class="bg-white rounded-[2.5rem] shadow-sm p-6">
+
+                <div id="edit-preview-card"
+                    class="mb-4 bg-slate-50 p-2 rounded-2xl border border-slate-100 shadow-inner"></div>
+
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="edit-name" placeholder="名前"
+                            class="p-2.5 bg-slate-50 rounded-xl text-xs outline-none focus:ring-1 focus:ring-[#bef264]">
+
+                        <select id="edit-grade" class="p-2.5 bg-slate-50 rounded-xl text-xs outline-none">
+                            <option value="1">1年</option>
+                            <option value="2">2年</option>
+                            <option value="3">3年</option>
+                            <option value="4">4年</option>
+                            <option value="OB/OG">OB/OG</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div id="part-chips" class="flex flex-wrap gap-1.5">
+                            <button type="button" onclick="togglePart(this)"
+                                class="part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Gt">Gt</button>
+                            <button type="button" onclick="togglePart(this)"
+                                class="part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Ba">Ba</button>
+                            <button type="button" onclick="togglePart(this)"
+                                class="part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Dr">Dr</button>
+                            <button type="button" onclick="togglePart(this)"
+                                class="part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Key">Key</button>
+                            <button type="button" onclick="togglePart(this)"
+                                class="part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Vo">Vo</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div id="status-chips" class="flex flex-wrap gap-1.5">
+                            <button type="button" onclick="toggleStatusChip(this)"
+                                class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="ミニライブ">ミニライブ</button>
+                            <button type="button" onclick="toggleStatusChip(this)"
+                                class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="定期ライブ">定期ライブ</button>
+                            <button type="button" onclick="toggleStatusChip(this)"
+                                class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="合宿">合宿</button>
+                            <button type="button" onclick="toggleStatusChip(this)"
+                                class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="非公式ライブ">非公式ライブ</button>
+                            <button type="button" onclick="toggleStatusChip(this)"
+                                class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="DMして">DMして</button>
+                            <button type="button" onclick="toggleStatusChip(this)"
+                                class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="むり">むり</button>
+                        </div>
+                    </div>
+
+                    <textarea id="edit-comment" maxlength="60"
+                        class="w-full p-3 bg-slate-50 rounded-xl text-xs outline-none h-16 resize-none"
+                        placeholder="一言コメント"></textarea>
+
+                    <div class="bg-slate-100 p-2.5 rounded-2xl space-y-2">
+                        <div class="flex items-center bg-white rounded-lg px-2 border border-slate-200">
+                            <span class="text-slate-400 text-[11px] font-bold mr-1">@</span>
+                            <input type="text" id="edit-auth-id" placeholder="TwitterID"
+                                class="w-full py-2 bg-transparent text-[11px] font-mono outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <button id="btn-save-account" onclick="handleFinalize()"
+                        class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl text-[11px] shadow-lg">
+                        保存
+                    </button>
+                </div>
+            </div>
+        </section>
+
     </main>
+
 
     <!-- Notice Modal -->
     <div id="notice-modal" class="fixed inset-0 z-[70] flex items-end justify-center hidden">
@@ -321,16 +428,38 @@
             </button>
         </div>
 
-        <button id="fab-main"
-            class="bg-[#bef264] text-slate-700 w-14 h-14 rounded-full shadow-lg
-                   flex items-center justify-center text-3xl border-2 border-white transition-all">
-            <span id="fab-icon" class="mb-1 inline-flex">
-                <svg viewBox="0 0 24 24" aria-hidden="true" class="w-7 h-7 text-slate-700">
-                    <path fill="currentColor" d="M11 5h2v14h-2V5Zm-6 6h14v2H5v-2Z"/>
-                </svg>
-            </span>
+        <button id="fab-main" class="bg-[#bef264] text-slate-700 w-14 h-14 rounded-full shadow-lg flex items-center justify-center border-2 border-white transition-all" aria-label="アカウント">
+            <svg id="fab-icon" viewBox="0 0 24 24" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="8.5" r="3.5"></circle>
+                <path d="M4.5 20a7.5 7.5 0 0 1 15 0"></path>
+            </svg>
         </button>
     </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4">
+        <div id="login-overlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+        <div id="login-content" class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-[320px] z-10 p-6 transform transition-all scale-95 opacity-0 duration-200">
+
+            <div class="space-y-3">
+                <div class="flex items-center bg-slate-50 rounded-xl px-3 border border-slate-100">
+                    <span class="text-slate-400 text-[12px] font-bold mr-2">@</span>
+                    <input id="login-id" type="text" placeholder="TwitterID" class="w-full py-3 bg-transparent text-[12px] font-mono outline-none" />
+                </div>
+
+                <input id="login-pass" type="password" inputmode="numeric" maxlength="4" placeholder="PW（数字4桁）" class="w-full p-3 bg-slate-50 rounded-xl text-[12px] border border-slate-100 outline-none" />
+
+                <button id="btn-login-submit" class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl text-[12px] shadow-lg">
+                    ログイン
+                </button>
+
+                <button id="btn-login-cancel" class="w-full py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-[12px]">
+                    閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <script defer src="state.js"></script>
     <script defer src="members.js"></script>

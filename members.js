@@ -124,9 +124,10 @@ function renderMembers(displayList) {
         </div>
 
         <div class="mt-3 flex justify-between items-center border-t border-slate-50 pt-3">
-          <a href="https://twitter.com/${m.id}" target="_blank" rel="noopener"
-            class="inline-flex items-center justify-center bg-slate-900 text-white text-[11px] font-extrabold px-4 py-2 rounded-full border border-slate-900 shadow-sm hover:bg-white hover:text-slate-900 hover:border-slate-300 transition">
-          X
+          <a href="https://twitter.com/${m.id}" target="_blank" class="x-btn">
+            <svg viewBox="0 0 24 24" class="x-icon" aria-hidden="true">
+              <path d="M18.244 2H21l-6.518 7.455L22 22h-6.889l-4.52-5.92L5.56 22H3l7.01-8.02L2 2h7.03l4.087 5.388L18.244 2zm-1.207 18h1.91L8.12 4H6.07l10.967 16z"/>
+            </svg>
           </a>
         </div>
       </div>

@@ -143,20 +143,7 @@ function applyFilterSheet() {
   window.resetFilterSheet = window.resetFilterSheet || resetFilterSheet;
   window.applyFilterSheet = window.applyFilterSheet || applyFilterSheet;
 
-  document.getElementById("btn-filter")?.addEventListener("click", () => openFilterSheet("filter"));
-  document.getElementById("btn-sort")?.addEventListener("click", () => openFilterSheet("sort"));
-
-  document.getElementById("btn-filter-close")?.addEventListener("click", closeFilterSheet);
-  document.getElementById("filter-overlay")?.addEventListener("click", closeFilterSheet);
-
-  document.getElementById("tab-filter")?.addEventListener("click", () => setFilterSheetTab("filter"));
-  document.getElementById("tab-sort")?.addEventListener("click", () => setFilterSheetTab("sort"));
-
-  document.getElementById("btn-filter-reset")?.addEventListener("click", resetFilterSheet);
-  document.getElementById("btn-filter-apply")?.addEventListener("click", applyFilterSheet);
-
-  document.getElementById("filter-fav")?.addEventListener("click", toggleFavFilter);
-
+  bindFilterSortButtons?.();
 
   document.getElementById("refresh-btn")?.addEventListener("click", () => {
     fetchMembers();
@@ -166,6 +153,22 @@ function applyFilterSheet() {
   document.getElementById("btn-notice")?.addEventListener("click", openNoticeModal);
   document.getElementById("btn-notice-close")?.addEventListener("click", closeNoticeModal);
 
+  document.getElementById("tab-search")?.addEventListener("click", () => goTab("search"));
+  document.getElementById("tab-account")?.addEventListener("click", () => goTab("account"));
+
+  document.getElementById("btn-login-open")?.addEventListener("click", () => {
+    if (isLoggedIn) return;
+    openLoginModal();
+  });
+
+  document.getElementById("btn-login-cancel")?.addEventListener("click", closeLoginModal);
+  document.getElementById("login-overlay")?.addEventListener("click", closeLoginModal);
+  document.getElementById("btn-login-submit")?.addEventListener("click", performLogin);
+
+  document.getElementById("login-pass")?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") performLogin();
+  });
+
   const noticeModal = document.getElementById("notice-modal");
   if (noticeModal) {
     const overlay = noticeModal.querySelector(":scope > div.absolute");
@@ -173,6 +176,153 @@ function applyFilterSheet() {
   }
 
   document.getElementById("edit-auth-id")?.addEventListener("input", updatePreview);
+
+  function updateTopTabsVisibility() {
+    const tabs = document.getElementById("top-tabs");
+    if (!tabs) return;
+    tabs.classList.toggle("hidden", !isLoggedIn);
+  }
+
+  function applyTabUI(tab) {
+    const panelSearch = document.getElementById("panel-search");
+    const panelAccount = document.getElementById("panel-account");
+    const btnSearch = document.getElementById("tab-search");
+    const btnAccount = document.getElementById("tab-account");
+
+    if (panelSearch) panelSearch.classList.toggle("hidden", tab !== "search");
+    if (panelAccount) panelAccount.classList.toggle("hidden", tab !== "account");
+
+    if (btnSearch) {
+      btnSearch.classList.toggle("bg-slate-800", tab === "search");
+      btnSearch.classList.toggle("text-white", tab === "search");
+      btnSearch.classList.toggle("text-slate-700", tab !== "search");
+    }
+    if (btnAccount) {
+      btnAccount.classList.toggle("bg-slate-800", tab === "account");
+      btnAccount.classList.toggle("text-white", tab === "account");
+      btnAccount.classList.toggle("text-slate-500", tab !== "account");
+    }
+  }
+
+  function goTab(tab) {
+    setActiveTab(tab);
+    applyTabUI(activeTab);
+  }
+
+  function openLoginModal() {
+    const modal = document.getElementById("login-modal");
+    const content = document.getElementById("login-content");
+    if (!modal || !content) return;
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+
+    setTimeout(() => {
+      content.classList.remove("scale-95", "opacity-0");
+      content.classList.add("scale-100", "opacity-100");
+    }, 10);
+
+    document.getElementById("login-id")?.focus();
+  }
+
+  function closeLoginModal() {
+    const modal = document.getElementById("login-modal");
+    const content = document.getElementById("login-content");
+    if (!modal || !content) return;
+
+    content.classList.remove("scale-100", "opacity-100");
+    content.classList.add("scale-95", "opacity-0");
+
+    setTimeout(() => {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }, 200);
+  }
+
+  function updateAccountFabVisibility() {
+    const fab = document.getElementById("fab-group");
+    if (!fab) return;
+
+    fab.classList.toggle("hidden", isLoggedIn);
+  }
+
+  async function performLogin() {
+    const id = (document.getElementById("login-id")?.value || "").trim();
+    const pass = (document.getElementById("login-pass")?.value || "").trim();
+
+    if (!id || !/^\d{4}$/.test(pass)) {
+      alert("IDとPW（数字4桁）を入力してください");
+      return;
+    }
+
+    const btn = document.getElementById("btn-login-submit");
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "確認中...";
+    }
+
+    try {
+      const resp = await fetch(API_URL);
+      const members = await resp.json();
+
+      const me = Array.isArray(members) ? members.find(m => String(m.id) === String(id)) : null;
+
+      if (!me) {
+        setLoggedIn(true);
+        localStorage.setItem("homes_login_id", id);
+        localStorage.setItem("homes_first_login", "1");
+        closeLoginModal();
+        updateTopTabsVisibility();
+        updateAccountFabVisibility();
+        goTab("account");
+        return;
+      }
+
+      const payload = {
+        id,
+        pass,
+        name: me.name || "",
+        grade: me.grade || "",
+        part: me.part || "",
+        status: me.status || "",
+        comment: me.comment || ""
+      };
+
+      const post = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+      const res = await post.json();
+
+      if (!res?.success) {
+        alert(res?.message || "ログイン失敗");
+        return;
+      }
+
+      setLoggedIn(true);
+      localStorage.setItem("homes_login_id", id);
+      localStorage.removeItem("homes_first_login");
+
+      closeLoginModal();
+      updateTopTabsVisibility();
+      updateAccountFabVisibility();
+      goTab("search");
+    } catch (e) {
+      console.error(e);
+      alert("ログイン失敗");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "ログイン";
+      }
+    }
+  }
+
+  updateTopTabsVisibility();
+  applyTabUI(activeTab);
+
+  updateAccountFabVisibility();
+  if (isLoggedIn && localStorage.getItem("homes_first_login") === "1") {
+    localStorage.removeItem("homes_first_login");
+    goTab("account");
+  }
 
   fetchMembers();
   fetchNotices();

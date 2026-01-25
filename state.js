@@ -13,6 +13,20 @@ let lastSeenNoticeAt = localStorage.getItem("notice_last_seen_at"); // ISO文字
 
 let sortMode = localStorage.getItem("sort_mode") || "updatedDesc";
 
+let isLoggedIn = localStorage.getItem("homes_logged_in") === "1";
+let activeTab = localStorage.getItem("homes_active_tab") || "search";
+
+function setLoggedIn(v) {
+  isLoggedIn = !!v;
+  localStorage.setItem("homes_logged_in", isLoggedIn ? "1" : "0");
+}
+
+function setActiveTab(v) {
+  activeTab = v === "account" ? "account" : "search";
+  localStorage.setItem("homes_active_tab", activeTab);
+}
+
+
 /* =========================
    Helpers (shared)
 ========================= */
@@ -47,4 +61,28 @@ function partRank(partStr) {
 function updatedAtToTime(m) {
   const d = toDateSafe(m.updatedAt);
   return d ? d.getTime() : 0;
+}
+
+/* =========================
+   Auth (keep login)
+========================= */
+let authId = localStorage.getItem("auth_id") || "";
+let authPass = localStorage.getItem("auth_pass") || "";
+
+function isLoggedIn() {
+  return !!authId && !!authPass;
+}
+
+function setAuth(id, pass) {
+  authId = String(id || "").trim();
+  authPass = String(pass || "").trim();
+  localStorage.setItem("auth_id", authId);
+  localStorage.setItem("auth_pass", authPass);
+}
+
+function clearAuth() {
+  authId = "";
+  authPass = "";
+  localStorage.removeItem("auth_id");
+  localStorage.removeItem("auth_pass");
 }

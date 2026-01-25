@@ -1,29 +1,4 @@
 /* =========================
-   Menu (FAB)
-========================= */
-function toggleMenu() {
-  isMenuOpen = !isMenuOpen;
-
-  const fab = document.getElementById("fab-main");
-  const container = document.getElementById("btn-login-container");
-  const overlay = document.getElementById("menu-overlay");
-
-  if (!fab || !container || !overlay) return;
-
-  if (isMenuOpen) {
-    overlay.classList.remove("hidden");
-    setTimeout(() => overlay.classList.add("opacity-100"), 10);
-    fab.style.transform = "rotate(135deg)";
-    container.classList.add("fab-child-show");
-  } else {
-    overlay.classList.remove("opacity-100");
-    setTimeout(() => overlay.classList.add("hidden"), 300);
-    fab.style.transform = "rotate(0deg)";
-    container.classList.remove("fab-child-show");
-  }
-}
-
-/* =========================
    Filter / Sort Bottom Sheet
 ========================= */
 function openFilterSheet(initialTab) {
@@ -110,4 +85,23 @@ function applyFilterSheet() {
 
   applyFilters();
   closeFilterSheet();
+}
+
+function bindFilterSortButtons() {
+  document.getElementById("btn-filter")?.addEventListener("click", () => openFilterSheet("filter"));
+  document.getElementById("btn-sort")?.addEventListener("click", () => openFilterSheet("sort"));
+
+  document.getElementById("btn-filter-close")?.addEventListener("click", closeFilterSheet);
+  document.getElementById("filter-overlay")?.addEventListener("click", closeFilterSheet);
+
+  document.getElementById("tab-filter")?.addEventListener("click", () => setFilterSheetTab("filter"));
+  document.getElementById("tab-sort")?.addEventListener("click", () => setFilterSheetTab("sort"));
+
+  document.getElementById("btn-filter-reset")?.addEventListener("click", resetFilterSheet);
+  document.getElementById("btn-filter-apply")?.addEventListener("click", applyFilterSheet);
+
+  document.getElementById("filter-fav")?.addEventListener("click", toggleFavFilter);
+  document.getElementById("filter-part")?.addEventListener("change", applyFilters);
+  document.getElementById("filter-grade")?.addEventListener("change", applyFilters);
+  document.getElementById("filter-status")?.addEventListener("change", applyFilters);
 }
