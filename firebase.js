@@ -2,14 +2,14 @@
    Firebase Configuration
    ========================= */
 
-// TODO: Replace with your Firebase config from Firebase Console
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAjUdT3q-vjgTqqmdV1QMk_IEF7blOIET4",
+  authDomain: "homes-matching.firebaseapp.com",
+  projectId: "homes-matching",
+  storageBucket: "homes-matching.firebasestorage.app",
+  messagingSenderId: "1023147657239",
+  appId: "1:1023147657239:web:d1c071a783e9a61673f452",
+  measurementId: "G-M5HZLJBEY6"
 };
 
 // Initialize Firebase
