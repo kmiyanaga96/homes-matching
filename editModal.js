@@ -8,6 +8,29 @@ function toggleStatusChip(btn) {
   updatePreview();
 }
 
+/* =========================
+   動的ステータスチップ生成
+========================= */
+function renderStatusChips(containerId, chipClass, withOnclick = false) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const availableEvents = getAvailableEvents();
+  container.innerHTML = availableEvents.map(e => {
+    const onclick = withOnclick ? `onclick="toggleStatusChip(this)"` : "";
+    return `<button type="button" ${onclick}
+      class="${chipClass} px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+      data-value="${e.label}">${e.label}</button>`;
+  }).join("");
+
+  // イベントリスナーを再バインド（onclick不使用の場合）
+  if (!withOnclick) {
+    container.querySelectorAll(`.${chipClass}`).forEach(b => {
+      b.addEventListener("click", () => b.classList.toggle("active"));
+    });
+  }
+}
+
 function openEditModal() {
   if (isMenuOpen) toggleMenu();
 
@@ -16,6 +39,9 @@ function openEditModal() {
   if (!modal || !content) return;
 
   modal.classList.remove("hidden");
+
+  // 動的にステータスチップを生成
+  renderStatusChips("status-chips", "status-chip", true);
 
   document.querySelectorAll(".part-chip, .status-chip").forEach((c) => c.classList.remove("active"));
 

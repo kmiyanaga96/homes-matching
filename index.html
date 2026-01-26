@@ -133,15 +133,10 @@
 
                     <div class="space-y-1.5">
                         <p class="text-[9px] text-slate-400 font-bold ml-1 uppercase tracking-wider">
-                            次いつ組む？ (複数選択可)
+                            募集中ライブ (複数選択可)
                         </p>
-                        <div class="flex flex-wrap gap-1.5">
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="ミニライブ">ミニライブ</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="定期ライブ">定期ライブ</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="合宿">合宿</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="非公式ライブ">非公式ライブ</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="DMして">DMして</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="むり">むり</button>
+                        <div id="acc-status-chips" class="flex flex-wrap gap-1.5">
+                            <!-- 動的生成 -->
                         </div>
                     </div>
 
@@ -245,13 +240,8 @@
 
                     <select id="filter-status"
                         class="bg-slate-50 shadow-sm rounded-xl px-3 py-3 text-xs text-gray-500 border-none outline-none">
-                        <option value="">次いつ組む？</option>
-                        <option value="ミニライブ">ミニライブ</option>
-                        <option value="定期ライブ">定期ライブ</option>
-                        <option value="合宿">合宿</option>
-                        <option value="非公式ライブ">非公式ライブ</option>
-                        <option value="DMして">DMして</option>
-                        <option value="むり">むり</option>
+                        <option value="">募集中ライブ</option>
+                        <!-- 動的生成 -->
                     </select>
                 </div>
             </div>
@@ -332,27 +322,10 @@
 
                 <div class="space-y-1.5">
                     <p class="text-[9px] text-slate-400 font-bold ml-1 uppercase tracking-wider">
-                        いつ組む？ (複数選択可)
+                        募集中ライブ (複数選択可)
                     </p>
                     <div id="status-chips" class="flex flex-wrap gap-1.5">
-                        <button type="button" onclick="toggleStatusChip(this)"
-                            class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
-                            data-value="ミニライブ">ミニライブ</button>
-                        <button type="button" onclick="toggleStatusChip(this)"
-                            class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
-                            data-value="定期ライブ">定期ライブ</button>
-                        <button type="button" onclick="toggleStatusChip(this)"
-                            class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
-                            data-value="合宿">合宿</button>
-                        <button type="button" onclick="toggleStatusChip(this)"
-                            class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
-                            data-value="非公式ライブ">非公式ライブ</button>
-                        <button type="button" onclick="toggleStatusChip(this)"
-                            class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
-                            data-value="DMして">DMして</button>
-                        <button type="button" onclick="toggleStatusChip(this)"
-                            class="status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
-                            data-value="むり">むり</button>
+                        <!-- 動的生成 -->
                     </div>
                 </div>
 
