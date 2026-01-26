@@ -333,6 +333,14 @@ function applyFilterSheet() {
     }
   }
 
+  // 認証状態の整合性チェック：isLoggedInがtrueでも認証情報がなければログアウト扱い
+  if (isLoggedIn && !hasAuth()) {
+    setLoggedIn(false);
+    clearAuth();
+    localStorage.removeItem("homes_login_id");
+    localStorage.removeItem("homes_first_login");
+  }
+
   updateTopTabsVisibility();
   applyTabUI(activeTab);
 
