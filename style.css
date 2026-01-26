@@ -14,7 +14,9 @@
    チップ（パート・ステータス）
 ========================= */
 .part-chip.active,
-.status-chip.active {
+.status-chip.active,
+.acc-part-chip.active,
+.acc-status-chip.active {
     background-color: #bef264;
     color: #3f6212;
     border-color: #a3e635;

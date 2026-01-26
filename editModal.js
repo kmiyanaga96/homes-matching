@@ -128,19 +128,23 @@ function fillAccountFormFromAuth() {
   if (label) label.innerText = `@${authId || ""}`;
 
   const me = (allMembers || []).find((m) => String(m.id) === String(authId));
-  document.getElementById("acc-name").value = me?.name || "";
-  document.getElementById("acc-grade").value = me?.grade || "1";
-  document.getElementById("acc-comment").value = me?.comment || "";
+  const nameEl = document.getElementById("acc-name");
+  const gradeEl = document.getElementById("acc-grade");
+  const commentEl = document.getElementById("acc-comment");
 
-  setChipsActive(".part-chip", me?.part || "");
-  setChipsActive(".status-chip", me?.status || "");
+  if (nameEl) nameEl.value = me?.name || "";
+  if (gradeEl) gradeEl.value = me?.grade || "1";
+  if (commentEl) commentEl.value = me?.comment || "";
+
+  setChipsActive(".acc-part-chip", me?.part || "");
+  setChipsActive(".acc-status-chip", me?.status || "");
 }
 
 function bindAccountChips() {
-  document.querySelectorAll("#view-account .part-chip").forEach((b) => {
+  document.querySelectorAll(".acc-part-chip").forEach((b) => {
     b.addEventListener("click", () => b.classList.toggle("active"));
   });
-  document.querySelectorAll("#view-account .status-chip").forEach((b) => {
+  document.querySelectorAll(".acc-status-chip").forEach((b) => {
     b.addEventListener("click", () => b.classList.toggle("active"));
   });
 }
@@ -156,8 +160,8 @@ async function saveAccount() {
     pass: authPass,
     name: document.getElementById("acc-name")?.value || "",
     grade: document.getElementById("acc-grade")?.value || "",
-    part: getActiveChips("#view-account .part-chip"),
-    status: getActiveChips("#view-account .status-chip"),
+    part: getActiveChips(".acc-part-chip"),
+    status: getActiveChips(".acc-status-chip"),
     comment: document.getElementById("acc-comment")?.value || "",
   };
 
