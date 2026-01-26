@@ -131,17 +131,18 @@ function toggleStatusChip(btn) {
   updatePreview();
 }
 
-// Override for Account chips too
-// We need to expose this or bind it.
+/* =========================
+   動的ステータスチップ生成
 
 function openEditModal() {
-  if (isMenuOpen) toggleMenu();
-
   const modal = document.getElementById("edit-modal");
   const content = document.getElementById("edit-content");
   if (!modal || !content) return;
 
   modal.classList.remove("hidden");
+
+  // 動的にステータスチップを生成
+  renderStatusChips("status-chips", "status-chip", true);
 
   document.querySelectorAll(".part-chip, .status-chip").forEach((c) => c.classList.remove("active"));
 
@@ -272,6 +273,9 @@ function fillAccountFormFromAuth() {
   const label = document.getElementById("account-id-label");
   if (label) label.innerText = `@${authId || ""}`;
 
+  // 動的にステータスチップを生成
+  renderStatusChips("acc-status-chips", "acc-status-chip", false);
+
   const me = (allMembers || []).find((m) => String(m.id) === String(authId));
   const nameEl = document.getElementById("acc-name");
   const gradeEl = document.getElementById("acc-grade");
@@ -286,10 +290,10 @@ function fillAccountFormFromAuth() {
 }
 
 function bindAccountChips() {
+  // パートチップのみバインド（ステータスはfillAccountFormFromAuthで動的生成）
   document.querySelectorAll(".acc-part-chip").forEach((b) => {
     b.addEventListener("click", () => b.classList.toggle("active"));
   });
-  // Status chips are dynamic and handle their own events.
 }
 
 async function saveAccount() {

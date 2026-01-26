@@ -1,40 +1,12 @@
 /* =========================
    Filter / Sort Bottom Sheet
-   ========================= */
-
-function initFilterStatusOptions() {
-  const select = document.getElementById("filter-status");
-  if (!select) return;
-
-  const visible = getVisibleEvents();
-
-  // Clear existing options except the first one "次いつ組む？"
-  // Safe way: keep the first child? Or strictly "value=''".
-  select.innerHTML = `<option value="">次いつ組む？</option>`;
-
-  // "Recruiting" filter? 
-  // User said: "Filter by individual status... Filtering 'Recruiting only display'..."
-  // Does "Recruiting" mean "Has ANY status"?
-  // Or "Select specific status".
-  // "Recruiting only display" -> "Displays 'Recruiting' at the head of the column... Only filter recruiting people."
-  // If the user selects a status in the filter (e.g. "Summer Camp"), show users recruiting for "Summer Camp".
-  // If the user selects NOTHING (default), show all? Or show only "Recruiting"?
-  // "Default is all unselected. Add element... Filter individual status. Only display recruiting..."
-  // It's a bit ambiguous. "募集中のみ表示" (Show only recurring) might be a separate toggle or the default behavior of the list?
-  // "Filter individual statuses. Show recruiting only..."
-  // I think it means: Provide options for each event.
-
-  visible.forEach(ev => {
-    const opt = document.createElement("option");
-    opt.value = ev.name;
-    opt.textContent = ev.name;
-    select.appendChild(opt);
-  });
-}
 function openFilterSheet(initialTab) {
   const modal = document.getElementById("filter-modal");
   const content = document.getElementById("filter-content");
   if (!modal || !content) return;
+
+  // 動的にステータス選択肢を生成
+  renderFilterStatusOptions();
 
   setFilterSheetTab(initialTab || "filter");
 

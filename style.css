@@ -188,3 +188,59 @@
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.92);
 }
+
+/* =========================
+   募集中ステータス表示
+========================= */
+.recruiting-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.recruiting-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #16a34a;
+  margin-right: 4px;
+}
+
+.recruiting-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: #dcfce7;
+  color: #166534;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 9999px;
+}
+
+/* =========================
+   イベントステータスチップ（編集画面）
+========================= */
+.event-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.event-chip:hover {
+  background: #f1f5f9;
+}
+
+.event-chip.active {
+  background-color: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+  transform: scale(1.05);
+}

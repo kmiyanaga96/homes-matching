@@ -126,3 +126,44 @@ function clearAuth() {
   sessionStorage.removeItem("auth_id");
   sessionStorage.removeItem("auth_pass");
 }
+
+/* =========================
+   Event Definitions
+========================= */
+const EVENTS = [
+  { id: "shinkan", label: "新歓", month: 4 },
+  { id: "satsuki", label: "皐月", month: 5 },
+  { id: "summer_mini", label: "夏ミニ", month: 7 },
+  { id: "summer_regular", label: "夏定期", month: 8 },
+  { id: "summer_camp", label: "夏合宿", month: 8 },
+  { id: "tsukimi", label: "月見", month: 10 },
+  { id: "autumn_regular", label: "秋定期", month: 10 },
+  { id: "autumn_mini", label: "秋ミニ", month: 11 },
+  { id: "christmas", label: "クリラ", month: 12 },
+  { id: "winter_mini", label: "冬ミニ", month: 1 },
+  { id: "winter_regular", label: "冬定期", month: 2 },
+  { id: "spring_camp", label: "春合宿", month: 2 },
+  { id: "oikon", label: "追いコン", month: 3 }
+];
+
+function isEventWithinSixMonths(eventMonth) {
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1; // 1-12
+  const currentYear = now.getFullYear();
+
+  // Calculate the event's next occurrence
+  let eventYear = currentYear;
+  if (eventMonth < currentMonth) {
+    // Event is in the next year
+    eventYear = currentYear + 1;
+  }
+
+  const eventDate = new Date(eventYear, eventMonth - 1, 1);
+  const sixMonthsLater = new Date(currentYear, now.getMonth() + 6, now.getDate());
+
+  return eventDate <= sixMonthsLater;
+}
+
+function getAvailableEvents() {
+  return EVENTS.filter(e => isEventWithinSixMonths(e.month));
+}

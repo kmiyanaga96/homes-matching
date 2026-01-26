@@ -25,11 +25,20 @@ function applyFilters() {
   const gradeVal = document.getElementById("filter-grade")?.value || "";
   const statusVal = document.getElementById("filter-status")?.value || "";
 
+  // 半年以内のイベントのみ対象
+  const availableEvents = getAvailableEvents();
+  const availableLabels = availableEvents.map(e => e.label);
+
   const filtered = allMembers.filter((m) => {
     const matchName = (m.name || "").toLowerCase().includes(nameVal);
     const matchPart = partVal === "" || ((m.part || "").split("/").includes(partVal));
     const matchGrade = gradeVal === "" || String(m.grade) === gradeVal;
-    const matchStatus = statusVal === "" || ((m.status || "").split("/").includes(statusVal));
+
+    // ステータスフィルタ: 選択されたステータスで募集中の人のみ
+    const memberStatuses = (m.status || "").split("/").filter(Boolean);
+    const recruitingStatuses = memberStatuses.filter(s => availableLabels.includes(s));
+    const matchStatus = statusVal === "" || recruitingStatuses.includes(statusVal);
+
     const matchFav = !isFavFilterActive || favorites.includes(m.id);
     return matchName && matchPart && matchGrade && matchStatus && matchFav;
   });
@@ -88,7 +97,13 @@ function renderMembers(displayList) {
       )
       .join("");
 
-    const statusDisplay = (m.status || "").split("/").filter(Boolean).join(", ");
+    // 募集中ステータスのタグを生成（半年以内のイベントのみ）
+    const selectedStatuses = (m.status || "").split("/").filter(Boolean);
+    const availableEvents = getAvailableEvents();
+    const recruitingTags = selectedStatuses
+      .filter(s => availableEvents.some(e => e.label === s))
+      .map(s => `<span class="recruiting-tag">${s}</span>`)
+      .join("");
 
     const statusList = (m.status || "").split("/").filter(Boolean);
 
@@ -172,7 +187,16 @@ function renderMembers(displayList) {
           </div>
         </div>
 
-        ${statusHTML}
+        <div class="mt-3 px-1 cursor-pointer" onclick="toggleCard('${m.id}')">
+          <div class="recruiting-status mb-1">
+            ${recruitingTags ? `<span class="recruiting-label">募集中</span>${recruitingTags}` : '<span class="text-[10px] text-slate-400">募集なし</span>'}
+          </div>
+          <div class="comment-area">
+            <p class="text-xs text-slate-500 leading-relaxed">
+              ${m.comment || "イエッタイガー！"}
+            </p>
+          </div>
+        </div>
       </div>
     `;
 
