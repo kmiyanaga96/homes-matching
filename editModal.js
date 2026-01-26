@@ -32,8 +32,6 @@ function renderStatusChips(containerId, chipClass, withOnclick = false) {
 }
 
 function openEditModal() {
-  if (isMenuOpen) toggleMenu();
-
   const modal = document.getElementById("edit-modal");
   const content = document.getElementById("edit-content");
   if (!modal || !content) return;
@@ -153,6 +151,9 @@ function fillAccountFormFromAuth() {
   const label = document.getElementById("account-id-label");
   if (label) label.innerText = `@${authId || ""}`;
 
+  // 動的にステータスチップを生成
+  renderStatusChips("acc-status-chips", "acc-status-chip", false);
+
   const me = (allMembers || []).find((m) => String(m.id) === String(authId));
   const nameEl = document.getElementById("acc-name");
   const gradeEl = document.getElementById("acc-grade");
@@ -167,10 +168,8 @@ function fillAccountFormFromAuth() {
 }
 
 function bindAccountChips() {
+  // パートチップのみバインド（ステータスはfillAccountFormFromAuthで動的生成）
   document.querySelectorAll(".acc-part-chip").forEach((b) => {
-    b.addEventListener("click", () => b.classList.toggle("active"));
-  });
-  document.querySelectorAll(".acc-status-chip").forEach((b) => {
     b.addEventListener("click", () => b.classList.toggle("active"));
   });
 }
