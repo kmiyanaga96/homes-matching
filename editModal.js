@@ -3,10 +3,7 @@ function togglePart(btn) {
   updatePreview();
 }
 
-function toggleStatusChip(btn) {
-  btn.classList.toggle("active");
-  updatePreview();
-}
+// toggleStatusChip removed (duplicate)
 
 /* Dynamic chips generation for Edit Modal & Account Tab */
 function initEditModalStatuses() {
@@ -273,9 +270,7 @@ function bindAccountChips() {
   document.querySelectorAll(".acc-part-chip").forEach((b) => {
     b.addEventListener("click", () => b.classList.toggle("active"));
   });
-  document.querySelectorAll(".acc-status-chip").forEach((b) => {
-    b.addEventListener("click", () => b.classList.toggle("active"));
-  });
+  // Status chips are dynamic and handle their own events.
 }
 
 async function saveAccount() {
