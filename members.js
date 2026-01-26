@@ -90,6 +90,57 @@ function renderMembers(displayList) {
 
     const statusDisplay = (m.status || "").split("/").filter(Boolean).join(", ");
 
+    const statusList = (m.status || "").split("/").filter(Boolean);
+
+    // Filter out invalid/invisible events (optional: remove old events not in window?)
+    // User said: "Ranges outside statuses are hidden". 
+    // So we check against getVisibleEvents() OR we just check against the entire definitions?
+    // "Range outside statuses are hidden" likely means "Only show future-relevant statuses".
+    // I will filter by getVisibleEvents().
+    const visibleEvents = getVisibleEvents().map(e => e.name);
+    const validStatus = statusList.filter(s => visibleEvents.includes(s));
+
+    let statusHTML = "";
+    if (validStatus.length > 0) {
+      statusHTML = `<div class="mt-3 px-1 cursor-pointer" onclick="toggleCard('${m.id}')">`;
+      statusHTML += `<div class="flex flex-wrap gap-1.5 items-center mb-2">`;
+
+      // "Recruiting" Badge
+      statusHTML += `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-white shadow-sm">募集中</span>`;
+
+      // Status Chips
+      validStatus.forEach(s => {
+        const col = getEventColor(s);
+        statusHTML += `<span class="${col.bg} ${col.text} ${col.border} border px-2 py-0.5 rounded text-[10px] font-bold">${s}</span>`;
+      });
+
+      statusHTML += `</div>`; // end flex
+
+      statusHTML += `<div class="comment-area">
+            <p class="text-xs text-slate-500 leading-relaxed">
+              ${m.comment || "イエッタイガー！"}
+            </p>
+          </div>
+        </div>`;
+    } else {
+      // No recruiting status -> Just comment (or hidden if we strictly follow "Recruiting only" filtering?)
+      // User said: "Filter by status: Recruiting only display". 
+      // "募集中のみ表示" might mean "Only show users who are recruiting"?
+      // "Filtering is specific status filtering. Display only recruiting... header 'Recruiting'..."
+      // It sounds like the "Recruiting" badge is always visible if they have a status.
+      // If they don't have a status, do we show the card?
+      // Default behavior: show card.
+      // But if filtering is active, it will filter.
+
+      statusHTML = `<div class="mt-3 px-1 cursor-pointer" onclick="toggleCard('${m.id}')">
+          <div class="comment-area">
+            <p class="text-xs text-slate-500 leading-relaxed">
+              ${m.comment || "イエッタイガー！"}
+            </p>
+          </div>
+        </div>`;
+    }
+
     const cardHTML = `
       <div id="card-${m.id}" class="bg-white rounded-[2rem] shadow-sm pt-5 px-5 pb-4 animate-fadeIn ${obogClass}" style="animation-delay:${i * 0.02}s">
         <div class="flex items-start justify-between">
@@ -121,14 +172,7 @@ function renderMembers(displayList) {
           </div>
         </div>
 
-        <div class="mt-3 px-1 cursor-pointer" onclick="toggleCard('${m.id}')">
-          <p class="text-[10px] text-orange-400 font-bold mb-1">● ${statusDisplay || "未設定"}</p>
-          <div class="comment-area">
-            <p class="text-xs text-slate-500 leading-relaxed">
-              ${m.comment || "イエッタイガー！"}
-            </p>
-          </div>
-        </div>
+        ${statusHTML}
       </div>
     `;
 

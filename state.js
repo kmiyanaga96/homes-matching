@@ -59,6 +59,33 @@ function partRank(partStr) {
   return best;
 }
 
+/* ===== Event / Status Helpers ===== */
+function getVisibleEvents() {
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1; // 1-12
+
+  // 6 months window: [current, +1, ..., +5]
+  // e.g. current=10 (Oct) -> 10, 11, 12, 1, 2, 3
+  const months = [];
+  for (let i = 0; i < 6; i++) {
+    let m = currentMonth + i;
+    if (m > 12) m -= 12;
+    months.push(m);
+  }
+
+  return EVENT_DEFINITIONS.filter(ev => months.includes(ev.month));
+}
+
+function getEventDef(name) {
+  return EVENT_DEFINITIONS.find(e => e.name === name);
+}
+
+function getEventColor(name) {
+  const def = getEventDef(name);
+  if (!def) return EVENT_COLORS.others; // Default fallback
+  return EVENT_COLORS[def.type] || EVENT_COLORS.others;
+}
+
 function updatedAtToTime(m) {
   const d = toDateSafe(m.updatedAt);
   return d ? d.getTime() : 0;

@@ -148,6 +148,10 @@ function applyFilterSheet() {
   window.resetFilterSheet = window.resetFilterSheet || resetFilterSheet;
   window.applyFilterSheet = window.applyFilterSheet || applyFilterSheet;
 
+  // Initialize Dynamic Options
+  if (window.initEditModalStatuses) window.initEditModalStatuses();
+  if (window.initFilterStatusOptions) window.initFilterStatusOptions();
+
   bindFilterSortButtons?.();
 
   document.getElementById("refresh-btn")?.addEventListener("click", () => {

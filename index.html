@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -19,12 +20,16 @@
                 </h1>
 
                 <!-- notification button -->
-                <button id="btn-notice" data-open="false" class="absolute right-0 top-1/2 -translate-y-1/2 mr-1 p-2 text-slate-600">
+                <button id="btn-notice" data-open="false"
+                    class="absolute right-0 top-1/2 -translate-y-1/2 mr-1 p-2 text-slate-600">
                     <span class="notice-icon">
                         <svg class="notice-svg" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                            <path
+                                d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
                         </svg>
-                        <span id="notice-dot" class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                        <span id="notice-dot"
+                            class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full hidden"></span>
                     </span>
                 </button>
             </div>
@@ -33,7 +38,8 @@
             <div id="header-tabs" class="mt-3 hidden">
                 <div class="timeline-tabs">
                     <button id="tab-search" class="timeline-tab is-active" aria-label="検索">
-                        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M20 20l-3.5-3.5"></path>
                             <circle cx="11" cy="11" r="7"></circle>
                         </svg>
@@ -41,7 +47,8 @@
                     </button>
 
                     <button id="tab-account" class="timeline-tab" aria-label="アカウント">
-                        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M20 21a8 8 0 0 0-16 0"></path>
                             <circle cx="12" cy="9" r="4"></circle>
                         </svg>
@@ -54,7 +61,8 @@
 
 
     <!-- loading -->
-    <div id="loading" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm hidden">
+    <div id="loading"
+        class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm hidden">
         <div class="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-b-[#bef264]"></div>
     </div>
 
@@ -64,12 +72,16 @@
         <!-- Search View -->
         <section id="view-search">
             <div class="mb-6 space-y-3">
-                <input type="text" id="search-name" placeholder="名前で検索..." class="w-full p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-base">
+                <input type="text" id="search-name" placeholder="名前で検索..."
+                    class="w-full p-4 rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-[#bef264] outline-none text-base">
 
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <button id="btn-filter" class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100 flex items-center justify-center" aria-label="フィルタ">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <button id="btn-filter"
+                            class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100 flex items-center justify-center"
+                            aria-label="フィルタ">
+                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M4 6h16"></path>
                                 <path d="M7 6v0"></path>
                                 <circle cx="7" cy="6" r="2"></circle>
@@ -80,8 +92,11 @@
                             </svg>
                         </button>
 
-                        <button id="btn-sort" class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100 flex items-center justify-center" aria-label="並び替え">
-                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <button id="btn-sort"
+                            class="bg-white shadow-sm rounded-xl px-3 py-1.5 text-[11px] font-bold text-slate-600 border border-slate-100 flex items-center justify-center"
+                            aria-label="並び替え">
+                            <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M8 7l4-4 4 4"></path>
                                 <path d="M12 3v14"></path>
                                 <path d="M16 17l-4 4-4-4"></path>
@@ -123,11 +138,21 @@
                             パート (複数選択可)
                         </p>
                         <div class="flex flex-wrap gap-1.5">
-                            <button type="button" class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="Gt">Gt</button>
-                            <button type="button" class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="Ba">Ba</button>
-                            <button type="button" class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="Dr">Dr</button>
-                            <button type="button" class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="Key">Key</button>
-                            <button type="button" class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="Vo">Vo</button>
+                            <button type="button"
+                                class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Gt">Gt</button>
+                            <button type="button"
+                                class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Ba">Ba</button>
+                            <button type="button"
+                                class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Dr">Dr</button>
+                            <button type="button"
+                                class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Key">Key</button>
+                            <button type="button"
+                                class="acc-part-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
+                                data-value="Vo">Vo</button>
                         </div>
                     </div>
 
@@ -135,13 +160,8 @@
                         <p class="text-[9px] text-slate-400 font-bold ml-1 uppercase tracking-wider">
                             次いつ組む？ (複数選択可)
                         </p>
-                        <div class="flex flex-wrap gap-1.5">
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="ミニライブ">ミニライブ</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="定期ライブ">定期ライブ</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="合宿">合宿</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="非公式ライブ">非公式ライブ</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="DMして">DMして</button>
-                            <button type="button" class="acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all" data-value="むり">むり</button>
+                        <div id="acc-status-chips" class="flex flex-wrap gap-1.5">
+                            <!-- Dynamic Content -->
                         </div>
                     </div>
 
@@ -166,8 +186,7 @@
     <div id="notice-modal" class="fixed inset-0 z-[70] flex items-end justify-center hidden">
         <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
 
-        <div id="notice-content"
-            class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl z-10
+        <div id="notice-content" class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl z-10
                    transform translate-y-full transition-all duration-300">
 
             <div class="flex items-center justify-between mb-4">
@@ -175,8 +194,7 @@
                     <span class="bg-[#bef264] w-1.5 h-4 rounded-full mr-2"></span>
                     📌 お知らせ
                 </h3>
-                <button id="btn-notice-close"
-                    class="text-slate-400 text-lg font-bold">✕</button>
+                <button id="btn-notice-close" class="text-slate-400 text-lg font-bold">✕</button>
             </div>
 
             <div id="notice-list" class="space-y-3">
@@ -191,8 +209,7 @@
     <div id="filter-modal" class="fixed inset-0 z-[75] flex items-end justify-center hidden">
         <div id="filter-overlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
 
-        <div id="filter-content"
-            class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl z-10
+        <div id="filter-content" class="bg-white w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl z-10
                    transform translate-y-full transition-all duration-300">
 
             <div class="flex items-center justify-between mb-4">
@@ -205,12 +222,10 @@
 
             <!-- tabs -->
             <div class="flex gap-2 mb-4">
-                <button id="tab-filter"
-                    class="flex-1 py-2 rounded-xl text-xs font-bold bg-slate-800 text-white">
+                <button id="tab-filter" class="flex-1 py-2 rounded-xl text-xs font-bold bg-slate-800 text-white">
                     フィルタ
                 </button>
-                <button id="tab-sort"
-                    class="flex-1 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500">
+                <button id="tab-sort" class="flex-1 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500">
                     並び替え
                 </button>
             </div>
@@ -283,20 +298,21 @@
     <!-- edit modal（既存） -->
     <div id="edit-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">
         <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeEditModal()"></div>
-        <div id="edit-content" class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-[310px] z-10 p-6 transform transition-all scale-90 opacity-0 duration-200">
+        <div id="edit-content"
+            class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-[310px] z-10 p-6 transform transition-all scale-90 opacity-0 duration-200">
 
             <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center">
                 <span class="bg-[#bef264] w-1.5 h-4 rounded-full mr-2"></span>
                 プロフィール登録
             </h3>
 
-            <div id="edit-preview-card"
-                class="mb-4 bg-slate-50 p-2 rounded-2xl border border-slate-100 shadow-inner"></div>
+            <div id="edit-preview-card" class="mb-4 bg-slate-50 p-2 rounded-2xl border border-slate-100 shadow-inner">
+            </div>
 
             <div class="space-y-3">
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="edit-name" placeholder="名前"
-                    class="p-2.5 bg-slate-50 rounded-xl text-xs outline-none focus:ring-1 focus:ring-[#bef264]">
+                        class="p-2.5 bg-slate-50 rounded-xl text-xs outline-none focus:ring-1 focus:ring-[#bef264]">
 
                     <select id="edit-grade" class="p-2.5 bg-slate-50 rounded-xl text-xs outline-none">
                         <option value="1">1年</option>
@@ -363,22 +379,25 @@
                 <div class="bg-slate-100 p-2.5 rounded-2xl space-y-2">
                     <div class="flex items-center bg-white rounded-lg px-2 border border-slate-200">
                         <span class="text-slate-400 text-[11px] font-bold mr-1">@</span>
-                        <input type="text" id="edit-auth-id" placeholder="TwitterID" class="w-full py-2 bg-transparent text-[11px] font-mono outline-none">
+                        <input type="text" id="edit-auth-id" placeholder="TwitterID"
+                            class="w-full py-2 bg-transparent text-[11px] font-mono outline-none">
                     </div>
-                    <input type="password" id="edit-pass" placeholder="PW (数字4桁)" maxlength="4" class="w-full p-2 bg-white rounded-lg text-[11px] border border-slate-200 outline-none">
+                    <input type="password" id="edit-pass" placeholder="PW (数字4桁)" maxlength="4"
+                        class="w-full p-2 bg-white rounded-lg text-[11px] border border-slate-200 outline-none">
                 </div>
             </div>
 
             <div class="mt-5 flex space-x-2">
-                <button onclick="closeEditModal()" class="flex-1 py-3 bg-slate-100 text-slate-400 font-bold rounded-xl text-[11px]">戻る</button>
-                <button id="btn-finalize" onclick="handleFinalize()" class="flex-[1.5] py-3 bg-slate-800 text-white font-bold rounded-xl text-[11px] shadow-lg">確定</button>
+                <button onclick="closeEditModal()"
+                    class="flex-1 py-3 bg-slate-100 text-slate-400 font-bold rounded-xl text-[11px]">戻る</button>
+                <button id="btn-finalize" onclick="handleFinalize()"
+                    class="flex-[1.5] py-3 bg-slate-800 text-white font-bold rounded-xl text-[11px] shadow-lg">確定</button>
             </div>
         </div>
     </div>
 
     <!-- refresh -->
-    <button id="refresh-btn"
-        class="fixed bottom-6 left-6 bg-white text-slate-400 w-12 h-12 rounded-full shadow-lg
+    <button id="refresh-btn" class="fixed bottom-6 left-6 bg-white text-slate-400 w-12 h-12 rounded-full shadow-lg
                flex items-center justify-center border border-slate-50">
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -387,8 +406,11 @@
     </button>
 
     <!-- FAB -->
-    <button id="fab-main" class="fixed bottom-6 right-6 z-50 bg-[#bef264] text-slate-700 w-14 h-14 rounded-full shadow-lg flex items-center justify-center border-2 border-white" aria-label="アカウント">
-        <svg id="fab-icon" viewBox="0 0 24 24" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <button id="fab-main"
+        class="fixed bottom-6 right-6 z-50 bg-[#bef264] text-slate-700 w-14 h-14 rounded-full shadow-lg flex items-center justify-center border-2 border-white"
+        aria-label="アカウント">
+        <svg id="fab-icon" viewBox="0 0 24 24" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="8.5" r="3.5"></circle>
             <path d="M4.5 20a7.5 7.5 0 0 1 15 0"></path>
         </svg>
@@ -397,21 +419,26 @@
     <!-- Login Modal -->
     <div id="login-modal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4">
         <div id="login-overlay" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-        <div id="login-content" class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-[320px] z-10 p-6 transform transition-all scale-95 opacity-0 duration-200">
+        <div id="login-content"
+            class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-[320px] z-10 p-6 transform transition-all scale-95 opacity-0 duration-200">
 
             <div class="space-y-3">
                 <div class="flex items-center bg-slate-50 rounded-xl px-3 border border-slate-100">
                     <span class="text-slate-400 text-[12px] font-bold mr-2">@</span>
-                    <input id="login-id" type="text" placeholder="TwitterID" class="w-full py-3 bg-transparent text-[12px] font-mono outline-none" />
+                    <input id="login-id" type="text" placeholder="TwitterID"
+                        class="w-full py-3 bg-transparent text-[12px] font-mono outline-none" />
                 </div>
 
-                <input id="login-pass" type="password" inputmode="numeric" maxlength="4" placeholder="PW（数字4桁）" class="w-full p-3 bg-slate-50 rounded-xl text-[12px] border border-slate-100 outline-none" />
+                <input id="login-pass" type="password" inputmode="numeric" maxlength="4" placeholder="PW（数字4桁）"
+                    class="w-full p-3 bg-slate-50 rounded-xl text-[12px] border border-slate-100 outline-none" />
 
-                <button id="btn-login-submit" class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl text-[12px] shadow-lg">
+                <button id="btn-login-submit"
+                    class="w-full py-3 bg-slate-800 text-white font-bold rounded-xl text-[12px] shadow-lg">
                     ログイン
                 </button>
 
-                <button id="btn-login-cancel" class="w-full py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-[12px]">
+                <button id="btn-login-cancel"
+                    class="w-full py-3 bg-slate-100 text-slate-500 font-bold rounded-xl text-[12px]">
                     閉じる
                 </button>
             </div>
@@ -419,6 +446,7 @@
     </div>
 
 
+    <script defer src="constants.js"></script>
     <script defer src="state.js"></script>
     <script defer src="members.js"></script>
     <script defer src="editModal.js"></script>
@@ -426,5 +454,5 @@
     <script defer src="filterSort.js"></script>
     <script defer src="script.js"></script>
 </body>
-</html>
 
+</html>
