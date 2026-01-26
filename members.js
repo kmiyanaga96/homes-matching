@@ -91,7 +91,7 @@ function renderMembers(displayList) {
     const statusDisplay = (m.status || "").split("/").filter(Boolean).join(", ");
 
     const cardHTML = `
-      <div id="card-${m.id}" class="bg-white rounded-[2rem] shadow-sm pt-5 px-5 pb-3 animate-fadeIn ${obogClass}" style="animation-delay:${i * 0.02}s">
+      <div id="card-${m.id}" class="bg-white rounded-[2rem] shadow-sm pt-5 px-5 pb-4 animate-fadeIn ${obogClass}" style="animation-delay:${i * 0.02}s">
         <div class="flex items-start justify-between">
           <div class="flex items-center space-x-4 flex-1">
             <img src="https://unavatar.io/twitter/${m.id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(m.name || "")}"
@@ -107,28 +107,27 @@ function renderMembers(displayList) {
             </div>
           </div>
 
-          <button onclick="toggleFavorite('${m.id}')" class="p-2 text-xl">
-            <span id="heart-${m.id}" class="${isFav ? "is-fav" : "text-slate-200"}">
-              ${isFav ? "❤️" : "♡"}
-            </span>
-          </button>
+          <div class="flex items-center">
+            <a href="https://twitter.com/${m.id}" target="_blank" rel="noopener noreferrer" class="x-btn mr-1" aria-label="X profile" title="X">
+              <svg class="x-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18.9 2H22l-6.7 7.7L23 22h-6.8l-5.3-6.9L4.9 22H2l7.2-8.3L1 2h7l4.8 6.3L18.9 2z"></path>
+              </svg>
+            </a>
+            <button onclick="toggleFavorite('${m.id}')" class="p-2 text-xl">
+              <span id="heart-${m.id}" class="${isFav ? "is-fav" : "text-slate-200"}">
+                ${isFav ? "❤️" : "♡"}
+              </span>
+            </button>
+          </div>
         </div>
 
         <div class="mt-3 px-1 cursor-pointer" onclick="toggleCard('${m.id}')">
           <p class="text-[10px] text-orange-400 font-bold mb-1">● ${statusDisplay || "未設定"}</p>
           <div class="comment-area">
-            <p class="text-[11px] text-slate-500 leading-relaxed">
+            <p class="text-xs text-slate-500 leading-relaxed">
               ${m.comment || "よろしくお願いします！"}
             </p>
           </div>
-        </div>
-
-        <div class="mt-2 flex justify-end items-center border-t border-slate-50 pt-2">
-          <a href="https://twitter.com/${m.id}" target="_blank" rel="noopener noreferrer" class="x-btn" aria-label="X profile" title="X">
-            <svg class="x-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M18.9 2H22l-6.7 7.7L23 22h-6.8l-5.3-6.9L4.9 22H2l7.2-8.3L1 2h7l4.8 6.3L18.9 2z"></path>
-            </svg>
-          </a>
         </div>
       </div>
     `;
