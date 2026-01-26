@@ -186,7 +186,7 @@ export default function SearchPage() {
                 : 'bg-slate-100 text-slate-600'
             }`}
           >
-            ★ お気に入り
+            ♡ お気に入り
           </button>
         </div>
       </div>

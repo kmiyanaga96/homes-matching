@@ -57,10 +57,17 @@ export default function MemberCard({ member, isFavorite, onToggleFavorite, visib
             e.stopPropagation();
             onToggleFavorite();
           }}
-          className={`text-xl ${isFavorite ? 'text-rose-500' : 'text-slate-300'}`}
+          className={`text-2xl transition ${isFavorite ? 'text-rose-500' : 'text-slate-300'}`}
         >
-          ★
+          ♡
         </button>
+      </div>
+
+      {/* Comment - Always visible */}
+      <div className="px-3 pb-2">
+        <p className="text-sm text-slate-600 italic">
+          {member.comment || 'イエッタイガー！'}
+        </p>
       </div>
 
       {/* Status chips - Always visible */}
@@ -81,15 +88,11 @@ export default function MemberCard({ member, isFavorite, onToggleFavorite, visib
       {/* Expanded content */}
       {expanded && (
         <div className="px-3 pb-3 pt-1 border-t border-slate-100">
-          <p className="text-sm text-slate-600 whitespace-pre-wrap">
-            {member.comment || 'イエッタイガー！'}
-          </p>
-
           <a
             href={`https://twitter.com/${member.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 mt-2 text-xs text-blue-500 hover:underline"
+            className="inline-flex items-center gap-1 text-xs text-blue-500 hover:underline"
             onClick={(e) => e.stopPropagation()}
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
