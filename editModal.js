@@ -79,9 +79,27 @@ function renderAccountTabChips() {
     btn.dataset.value = ev.name;
     btn.dataset.type = ev.type;
     btn.textContent = ev.name;
-    btn.onclick = () => btn.classList.toggle("active");
+    btn.onclick = () => toggleAccountStatusChip(btn);
     container.appendChild(btn);
   });
+}
+
+function toggleAccountStatusChip(btn) {
+  btn.classList.toggle("active");
+  updateAccountChipStyle(btn);
+}
+
+function updateAccountChipStyle(btn) {
+  const type = btn.dataset.type || "others";
+  const colors = EVENT_COLORS[type] || EVENT_COLORS.others;
+
+  if (btn.classList.contains("active")) {
+    // Apply active styles (same colors as modal but different class name ref if needed, but classes are utility based)
+    btn.className = `acc-status-chip px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${colors.active} ${colors.text} ${colors.border} ${colors.ring || ""}`;
+  } else {
+    // Revert
+    btn.className = `acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
+  }
 }
 
 // Enhance the toggle functions to apply colors based on data-type?
@@ -217,7 +235,17 @@ function setChipsActive(selector, valuesStr) {
   const values = String(valuesStr || "").split("/").filter(Boolean);
   document.querySelectorAll(selector).forEach((btn) => {
     const v = btn.dataset.value;
-    btn.classList.toggle("active", values.includes(v));
+    const isActive = values.includes(v);
+    btn.classList.toggle("active", isActive);
+
+    // Auto-update style if it's a dynamic chip
+    // We check if it has 'acc-status-chip' or 'status-chip' class to decide which updater to call?
+    // Or just check if `updateAccountChipStyle` exists and applies?
+    if (btn.classList.contains("acc-status-chip") && typeof updateAccountChipStyle === "function") {
+      updateAccountChipStyle(btn);
+    } else if (btn.classList.contains("status-chip") && typeof updateChipStyle === "function") {
+      updateChipStyle(btn);
+    }
   });
 }
 

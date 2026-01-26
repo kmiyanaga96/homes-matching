@@ -106,7 +106,7 @@ function renderMembers(displayList) {
       statusHTML += `<div class="flex flex-wrap gap-1.5 items-center mb-2">`;
 
       // "Recruiting" Badge
-      statusHTML += `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-white shadow-sm">募集中</span>`;
+      statusHTML += `<span class="px-2 py-0.5 rounded text-[10px] font-bold text-slate-600 border border-slate-300">募集中</span>`;
 
       // Status Chips
       validStatus.forEach(s => {
