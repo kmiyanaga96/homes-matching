@@ -10,10 +10,15 @@ const API = {
   async getMembers() {
     try {
       const snapshot = await db.collection(COLLECTIONS.members).get();
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+          updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null
+        };
+      });
     } catch (e) {
       console.error("[API] getMembers error:", e);
       throw e;
@@ -25,7 +30,13 @@ const API = {
     try {
       const doc = await db.collection(COLLECTIONS.members).doc(id).get();
       if (!doc.exists) return null;
-      return { id: doc.id, ...doc.data() };
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+        updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null
+      };
     } catch (e) {
       console.error("[API] getMember error:", e);
       throw e;
