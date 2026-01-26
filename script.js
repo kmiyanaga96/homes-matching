@@ -27,12 +27,6 @@
     }
   });
 
-  window.openFilterSheet = window.openFilterSheet || openFilterSheet;
-  window.closeFilterSheet = window.closeFilterSheet || closeFilterSheet;
-  window.setFilterSheetTab = window.setFilterSheetTab || setFilterSheetTab;
-  window.resetFilterSheet = window.resetFilterSheet || resetFilterSheet;
-  window.applyFilterSheet = window.applyFilterSheet || applyFilterSheet;
-
   // Initialize Dynamic Options
   if (window.initEditModalStatuses) window.initEditModalStatuses();
   if (window.initFilterStatusOptions) window.initFilterStatusOptions();
