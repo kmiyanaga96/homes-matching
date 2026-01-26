@@ -17,6 +17,7 @@ const EVENT_DEFINITIONS = [
     { name: "冬定期", month: 2, type: "official" },
     { name: "春合宿", month: 2, type: "camp" }, // month 2 per user request
     { name: "追いコン", month: 3, type: "official" },
+    { name: "お休み", month: 0, type: "rest" }, // Month 0 for "No specific month"
 ];
 
 const EVENT_COLORS = {
@@ -35,6 +36,10 @@ const EVENT_COLORS = {
     others: {
         bg: "bg-lime-50", text: "text-lime-500", border: "border-lime-100",
         active: "bg-lime-100", ring: "ring-lime-400"
+    },
+    rest: {
+        bg: "bg-slate-100", text: "text-slate-500", border: "border-slate-200",
+        active: "bg-slate-200", ring: "ring-slate-400"
     }
 };
 

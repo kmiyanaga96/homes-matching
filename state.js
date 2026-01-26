@@ -64,8 +64,7 @@ function getVisibleEvents() {
   const now = new Date();
   const currentMonth = now.getMonth() + 1; // 1-12
 
-  // 6 months window: [current, +1, ..., +5]
-  // e.g. current=10 (Oct) -> 10, 11, 12, 1, 2, 3
+  // 6 months window
   const months = [];
   for (let i = 0; i < 6; i++) {
     let m = currentMonth + i;
@@ -73,7 +72,17 @@ function getVisibleEvents() {
     months.push(m);
   }
 
-  return EVENT_DEFINITIONS.filter(ev => months.includes(ev.month));
+  // Filter events: Check if month is in window OR month is 0 (always visible 'Rest')
+  const visible = EVENT_DEFINITIONS.filter(ev => ev.month === 0 || months.includes(ev.month));
+
+  // Sort Logic:
+  // User request: "4月⇒翌年3月⇒翌年度"
+  // Even if we have [Feb(2), Apr(4)], "Apr" comes first in our Definition list.
+  // If the user wants "Time based" sort (Feb -> Apr), we need to shift/rotate.
+  // BUT the user said "Edit screen ... is 4=>3". This implies preserving the Academic List order.
+  // So we just return the filtered list as is (since EVENT_DEFINITIONS is already 4..3).
+  // "Rest" (month 0) is at the end of definitions, so it appears at the end.
+  return visible;
 }
 
 function getEventDef(name) {

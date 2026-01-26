@@ -10,81 +10,78 @@ function toggleStatusChip(btn) {
 
 /* Dynamic chips generation for Edit Modal & Account Tab */
 function initEditModalStatuses() {
-  const visible = getVisibleEvents();
+  renderEditModalChips();
+  renderAccountTabChips();
 
-  // 1. Edit Modal Chips
+  // Bind grade change listeners
+  document.getElementById("edit-grade")?.addEventListener("change", renderEditModalChips);
+  document.getElementById("acc-grade")?.addEventListener("change", renderAccountTabChips);
+}
+
+function getAllowedEvents(grade, allVisible) {
+  if (grade === "OB/OG") {
+    // Only Satsuki, Tsukimi, Xmas, and Rest(0)
+    // Satsuki(5), Tsukimi(10), Xmas(12)
+    const allowedNames = ["皐月", "月見", "クリラ", "お休み"];
+    return allVisible.filter(ev => allowedNames.includes(ev.name));
+  }
+  return allVisible;
+}
+
+function renderEditModalChips() {
   const container = document.getElementById("status-chips");
-  if (container) {
-    container.innerHTML = "";
-    visible.forEach(ev => {
-      const col = getEventColor(ev.name);
-      // Use pastel background for chip?
-      // User said: "Select multiple options... Color coding... Pastel tones consistent with design"
-      // The current design uses `bg-slate-50` for inactive and `active` class handles logic?
-      // Existing chips: `bg-slate-50 text-slate-500 ... border-transparent`.
-      // When active: usually becomes colored.
-      // But here we want the chips to HAVE colors to distinguish them?
-      // Or only when selected?
-      // User: "Improve color unified display... Color coding for visual clarity."
-      // In the *modal*, it's good to show the color hint.
-      // But commonly, multiple choice chips are neutral until selected.
-      // HOWEVER, the user specifically mentioned color coding strategies.
-      // Let's make them colored by default but faded, and stronger when active?
-      // Or stick to the current "active" class logic but add the specific color class when active.
+  if (!container) return;
 
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = `status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
-      btn.dataset.value = ev.name;
-      btn.textContent = ev.name;
-      btn.onclick = () => toggleStatusChip(btn);
+  // Remember currently active values to preserve them if possible?
+  // Or clear them? If switching to OBOG, invalid ones should be removed.
+  // For simplicity, we just rebuild. User has to reselect if they change grade.
+  // Ideally we preserve valid ones.
+  const currentActive = getActiveChips(".status-chip.active").split("/").filter(Boolean); // Function from editModal but it's local? 
+  // Wait, getActiveChips is defined below. 
 
-      // We can add a custom attribute or store the color class to apply on toggling?
-      // For now, let's keep simple `active` toggle in JS, but we need to inject CSS or handle style in `updatePreview` / css?
-      // Actually `toggleStatusChip` just toggles `.active`.
-      // We should probably modify `toggleStatusChip` to apply specific colors?
-      // Or we can just use the `getEventColor` in the CSS or inline style?
-      // Let's add specific classes to the button itself for "type".
-      // But `bg-slate-50` is hardcoded.
+  // Actually, simply rebuilding is safest.
 
-      // Let's change the strategy:
-      // The chips will use the predefined colors but maybe a "faint" version if not active?
-      // Or just standard "Slate 50" -> "Color" when active.
-      // To do this, we need to know WHICH color to apply.
-      // We can set `data-type="official"` etc.
-      btn.dataset.type = ev.type;
+  const grade = document.getElementById("edit-grade")?.value || "1";
+  const visible = getVisibleEvents();
+  const allowed = getAllowedEvents(grade, visible);
 
-      container.appendChild(btn);
-    });
-  }
+  container.innerHTML = "";
+  allowed.forEach(ev => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
+    // If previously selected and still allowed, keep active?
+    // Need complex logic or just let user reselect.
+    // Re-selecting is safer UI behavior when constraints change.
 
-  // 2. Account Tab Chips
-  const accContainer = document.querySelector("#view-account .flex-wrap[id='acc-status-container']"); // Wait, id?
-  // Checking index.html... 
-  // Line 138: <div class="flex flex-wrap gap-1.5"> (no id)
-  // I need to identify it. It's inside `.space-y-1.5` after "次いつ組む？".
-  // Best to add an ID to that container in index.html first? 
-  // FOR NOW: I will update index.html to add IDs to these containers to be safe.
-  // OR I can use `document.querySelectorAll` and find the one containing `acc-status-chip`?
-  // But I want to empty it.
+    btn.dataset.value = ev.name;
+    btn.dataset.type = ev.type;
+    btn.textContent = ev.name;
+    btn.onclick = () => toggleStatusChip(btn);
+    container.appendChild(btn);
+  });
+}
 
-  // Let's assume I will add `id="acc-status-chips"` to index.html in the next step.
-  const accContainerRef = document.getElementById("acc-status-chips");
-  if (accContainerRef) {
-    accContainerRef.innerHTML = "";
-    visible.forEach(ev => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = `acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
-      btn.dataset.value = ev.name;
-      btn.dataset.type = ev.type;
-      btn.textContent = ev.name;
-      // The bindAccountChips function adds listeners, but here we create dynamic.
-      // So add listener directly.
-      btn.onclick = () => btn.classList.toggle("active");
-      accContainerRef.appendChild(btn);
-    });
-  }
+
+function renderAccountTabChips() {
+  const container = document.getElementById("acc-status-chips");
+  if (!container) return;
+
+  const grade = document.getElementById("acc-grade")?.value || "1";
+  const visible = getVisibleEvents();
+  const allowed = getAllowedEvents(grade, visible);
+
+  container.innerHTML = "";
+  allowed.forEach(ev => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
+    btn.dataset.value = ev.name;
+    btn.dataset.type = ev.type;
+    btn.textContent = ev.name;
+    btn.onclick = () => btn.classList.toggle("active");
+    container.appendChild(btn);
+  });
 }
 
 // Enhance the toggle functions to apply colors based on data-type?
