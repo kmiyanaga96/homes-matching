@@ -1,5 +1,37 @@
 /* =========================
    Filter / Sort Bottom Sheet
+========================= */
+
+function renderFilterStatusOptions() {
+  const select = document.getElementById("filter-status");
+  if (!select) return;
+
+  const currentValue = select.value;
+  const visibleEvents = getVisibleEvents();
+
+  // 既存のオプション（デフォルト以外）を削除
+  while (select.options.length > 1) {
+    select.remove(1);
+  }
+
+  // 半年以内のイベントのみ追加
+  visibleEvents.forEach(e => {
+    const opt = document.createElement("option");
+    opt.value = e.name;
+    opt.textContent = e.name;
+    select.appendChild(opt);
+  });
+
+  // 以前の値を復元（存在する場合）
+  if (currentValue && visibleEvents.some(e => e.name === currentValue)) {
+    select.value = currentValue;
+  }
+}
+
+function initFilterStatusOptions() {
+  renderFilterStatusOptions();
+}
+
 function openFilterSheet(initialTab) {
   const modal = document.getElementById("filter-modal");
   const content = document.getElementById("filter-content");

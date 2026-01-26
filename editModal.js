@@ -132,7 +132,32 @@ function toggleStatusChip(btn) {
 }
 
 /* =========================
-   動的ステータスチップ生成
+   Edit Modal
+========================= */
+
+function renderStatusChips(containerId, chipClass, withOnclick = false) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const visibleEvents = getVisibleEvents();
+  container.innerHTML = "";
+
+  visibleEvents.forEach(ev => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `${chipClass} px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
+    btn.dataset.value = ev.name;
+    btn.dataset.type = ev.type;
+    btn.textContent = ev.name;
+
+    if (withOnclick) {
+      btn.onclick = () => toggleStatusChip(btn);
+    } else {
+      btn.onclick = () => toggleAccountStatusChip(btn);
+    }
+    container.appendChild(btn);
+  });
+}
 
 function openEditModal() {
   const modal = document.getElementById("edit-modal");
