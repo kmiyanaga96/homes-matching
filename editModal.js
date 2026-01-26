@@ -11,8 +11,18 @@ function initEditModalStatuses() {
   renderAccountTabChips();
 
   // Bind grade change listeners
-  document.getElementById("edit-grade")?.addEventListener("change", renderEditModalChips);
+  const editGrade = document.getElementById("edit-grade");
+  if (editGrade) {
+    editGrade.addEventListener("change", () => {
+      renderEditModalChips();
+      updatePreview();
+    });
+  }
+
   document.getElementById("acc-grade")?.addEventListener("change", renderAccountTabChips);
+
+  // Bind name input for preview fallback
+  document.getElementById("edit-name")?.addEventListener("input", updatePreview);
 }
 
 function getAllowedEvents(grade, allVisible) {
@@ -158,12 +168,21 @@ function closeEditModal() {
 
 function updatePreview() {
   const id = document.getElementById("edit-auth-id")?.value || "";
+  const name = document.getElementById("edit-name")?.value || "";
+  const grade = document.getElementById("edit-grade")?.value || "";
   const preview = document.getElementById("edit-preview-card");
+
   if (!preview) return;
+
+  const iconUrl = `https://unavatar.io/twitter/${id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(name || "ID")}`;
+  const beginnerMark = grade === "1" ? `<span class="absolute -top-1 -left-1 text-sm filter drop-shadow-md z-10">🔰</span>` : "";
 
   preview.innerHTML = `
     <div class="flex items-center space-x-2 p-2">
-      <div class="w-9 h-9 rounded-full bg-slate-200"></div>
+      <div class="relative">
+        ${beginnerMark}
+        <img src="${iconUrl}" class="w-9 h-9 rounded-full bg-slate-200 object-cover">
+      </div>
       <div class="min-w-0">
         <div class="text-[10px] font-bold text-slate-600">@${id || "ID"}</div>
         <div class="text-[9px] text-slate-400">プレビュー</div>
