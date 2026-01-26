@@ -135,7 +135,6 @@ function applyFilterSheet() {
 
   document.getElementById("search-name")?.addEventListener("input", applyFilters);
   document.getElementById("fab-main")?.addEventListener("click", toggleMenu);
-  document.getElementById("btn-login-open")?.addEventListener("click", openEditModal);
 
   window.openFilterSheet = window.openFilterSheet || openFilterSheet;
   window.closeFilterSheet = window.closeFilterSheet || closeFilterSheet;
@@ -185,24 +184,45 @@ function applyFilterSheet() {
     el.classList.toggle("hidden", !isLoggedIn);
   }
 
+  function applyTabUI(tab) {
+    const viewSearch = document.getElementById("view-search");
+    const viewAccount = document.getElementById("view-account");
+    if (!viewSearch || !viewAccount) return;
 
-  function setActiveTab(tab) {
-  const tSearch = document.getElementById("tab-search");
-  const tAccount = document.getElementById("tab-account");
-  if (!tSearch || !tAccount) return;
+    if (tab === "account" && isLoggedIn) {
+      viewSearch.classList.add("hidden");
+      viewAccount.classList.remove("hidden");
+      fillAccountFormFromAuth();
+    } else {
+      viewSearch.classList.remove("hidden");
+      viewAccount.classList.add("hidden");
+    }
+  }
 
-  const isSearch = tab === "search";
+  function switchTab(tab) {
+    setActiveTab(tab);
+    applyTabUI(tab);
+  }
 
-  tSearch.classList.toggle("is-active", isSearch);
-  tAccount.classList.toggle("is-active", !isSearch);
 
-  tSearch.setAttribute("aria-selected", isSearch ? "true" : "false");
-  tAccount.setAttribute("aria-selected", !isSearch ? "true" : "false");
-}
+  function updateTabHighlight(tab) {
+    const tSearch = document.getElementById("tab-search");
+    const tAccount = document.getElementById("tab-account");
+    if (!tSearch || !tAccount) return;
+
+    const isSearch = tab === "search";
+
+    tSearch.classList.toggle("is-active", isSearch);
+    tAccount.classList.toggle("is-active", !isSearch);
+
+    tSearch.setAttribute("aria-selected", isSearch ? "true" : "false");
+    tAccount.setAttribute("aria-selected", !isSearch ? "true" : "false");
+  }
 
   function goTab(tab) {
     setActiveTab(tab);
-    applyTabUI(activeTab);
+    updateTabHighlight(tab);
+    applyTabUI(tab);
   }
 
   function openLoginModal() {
@@ -265,6 +285,7 @@ function applyFilterSheet() {
 
       if (!me) {
         setLoggedIn(true);
+        setAuth(id, pass);
         localStorage.setItem("homes_login_id", id);
         localStorage.setItem("homes_first_login", "1");
         closeLoginModal();
@@ -293,6 +314,7 @@ function applyFilterSheet() {
       }
 
       setLoggedIn(true);
+      setAuth(id, pass);
       localStorage.setItem("homes_login_id", id);
       localStorage.removeItem("homes_first_login");
 
@@ -315,6 +337,8 @@ function applyFilterSheet() {
   applyTabUI(activeTab);
 
   updateAccountFabVisibility();
+  bindAccountChips();
+
   if (isLoggedIn && localStorage.getItem("homes_first_login") === "1") {
     localStorage.removeItem("homes_first_login");
     goTab("account");
