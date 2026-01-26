@@ -6,11 +6,10 @@ async function fetchMembers() {
   if (loader) loader.classList.remove("hidden");
 
   try {
-    const resp = await fetch(API_URL);
-    allMembers = await resp.json();
+    allMembers = await API.getMembers();
     applyFilters();
   } catch (e) {
-    console.error(e);
+    console.error("[fetchMembers]", e);
   }
 
   if (loader) loader.classList.add("hidden");
