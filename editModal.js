@@ -94,8 +94,8 @@ function updateAccountChipStyle(btn) {
   const colors = EVENT_COLORS[type] || EVENT_COLORS.others;
 
   if (btn.classList.contains("active")) {
-    // Apply active styles (same colors as modal but different class name ref if needed, but classes are utility based)
-    btn.className = `acc-status-chip px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${colors.active} ${colors.text} ${colors.border} ${colors.ring || ""}`;
+    // Apply active styles - MUST include 'active' class so it can be toggled off!
+    btn.className = `acc-status-chip active px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${colors.active} ${colors.text} ${colors.border} ${colors.ring || ""}`;
   } else {
     // Revert
     btn.className = `acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
@@ -110,8 +110,8 @@ function updateChipStyle(btn) {
   const colors = EVENT_COLORS[type] || EVENT_COLORS.others;
 
   if (btn.classList.contains("active")) {
-    // Apply active styles
-    btn.className = `status-chip px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${colors.active} ${colors.text} ${colors.border} ${colors.ring || ""}`;
+    // Apply active styles - MUST include 'active' class
+    btn.className = `status-chip active px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${colors.active} ${colors.text} ${colors.border} ${colors.ring || ""}`;
   } else {
     // Revert to default
     btn.className = `status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
