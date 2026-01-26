@@ -73,15 +73,18 @@ function getVisibleEvents() {
   }
 
   // Filter events: Check if month is in window OR month is 0 (always visible 'Rest')
-  const visible = EVENT_DEFINITIONS.filter(ev => ev.month === 0 || months.includes(ev.month));
+  let visible = EVENT_DEFINITIONS.filter(ev => ev.month === 0 || months.includes(ev.month));
 
-  // Sort Logic:
-  // User request: "4月⇒翌年3月⇒翌年度"
-  // Even if we have [Feb(2), Apr(4)], "Apr" comes first in our Definition list.
-  // If the user wants "Time based" sort (Feb -> Apr), we need to shift/rotate.
-  // BUT the user said "Edit screen ... is 4=>3". This implies preserving the Academic List order.
-  // So we just return the filtered list as is (since EVENT_DEFINITIONS is already 4..3).
-  // "Rest" (month 0) is at the end of definitions, so it appears at the end.
+  // Sort Logic: Chronological from Current Month
+  // 1. Calculate distance for each (0-based)
+  // 2. 'Rest' (0) goes to bottom (distance 999)
+  visible.sort((a, b) => {
+    const distA = a.month === 0 ? 999 : (a.month - currentMonth + 12) % 12;
+    const distB = b.month === 0 ? 999 : (b.month - currentMonth + 12) % 12;
+    // Note: If months are the same, preserve original order? But names are unique usually.
+    return distA - distB;
+  });
+
   return visible;
 }
 
