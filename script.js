@@ -255,7 +255,9 @@ function applyFilterSheet() {
   }
 
   function updateAccountFabVisibility() {
-    // FABは常に表示（未ログイン時はログインモーダル、ログイン時はアカウントタブへ）
+    const fab = document.getElementById("fab-main");
+    if (!fab) return;
+    fab.classList.toggle("hidden", isLoggedIn);
   }
 
   async function performLogin() {
@@ -282,8 +284,8 @@ function applyFilterSheet() {
       if (!me) {
         setLoggedIn(true);
         setAuth(id, pass);
-        localStorage.setItem("homes_login_id", id);
-        localStorage.setItem("homes_first_login", "1");
+        sessionStorage.setItem("homes_login_id", id);
+        sessionStorage.setItem("homes_first_login", "1");
         closeLoginModal();
         updateTopTabsVisibility();
         updateAccountFabVisibility();
@@ -311,8 +313,8 @@ function applyFilterSheet() {
 
       setLoggedIn(true);
       setAuth(id, pass);
-      localStorage.setItem("homes_login_id", id);
-      localStorage.removeItem("homes_first_login");
+      sessionStorage.setItem("homes_login_id", id);
+      sessionStorage.removeItem("homes_first_login");
 
       closeLoginModal();
       updateTopTabsVisibility();
@@ -333,8 +335,8 @@ function applyFilterSheet() {
   if (isLoggedIn && !hasAuth()) {
     setLoggedIn(false);
     clearAuth();
-    localStorage.removeItem("homes_login_id");
-    localStorage.removeItem("homes_first_login");
+    sessionStorage.removeItem("homes_login_id");
+    sessionStorage.removeItem("homes_first_login");
   }
 
   updateTopTabsVisibility();
@@ -343,8 +345,8 @@ function applyFilterSheet() {
   updateAccountFabVisibility();
   bindAccountChips();
 
-  if (isLoggedIn && localStorage.getItem("homes_first_login") === "1") {
-    localStorage.removeItem("homes_first_login");
+  if (isLoggedIn && sessionStorage.getItem("homes_first_login") === "1") {
+    sessionStorage.removeItem("homes_first_login");
     goTab("account");
   }
 
