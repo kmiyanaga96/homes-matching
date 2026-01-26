@@ -134,7 +134,13 @@ function applyFilterSheet() {
   window.closeNoticeModal = window.closeNoticeModal || closeNoticeModal;
 
   document.getElementById("search-name")?.addEventListener("input", applyFilters);
-  document.getElementById("fab-main")?.addEventListener("click", toggleMenu);
+  document.getElementById("fab-main")?.addEventListener("click", () => {
+    if (!isLoggedIn) {
+      openLoginModal();
+    } else {
+      goTab("account");
+    }
+  });
 
   window.openFilterSheet = window.openFilterSheet || openFilterSheet;
   window.closeFilterSheet = window.closeFilterSheet || closeFilterSheet;
@@ -155,14 +161,6 @@ function applyFilterSheet() {
   document.getElementById("tab-search")?.addEventListener("click", () => goTab("search"));
   document.getElementById("tab-account")?.addEventListener("click", () => goTab("account"));
 
-  document.getElementById("btn-login-open")?.addEventListener("click", () => {
-    if (isMenuOpen) toggleMenu();
-    if (!isLoggedIn) {
-      openLoginModal();
-      return;
-    }
-    switchTab("account");
-  });
   document.getElementById("btn-login-cancel")?.addEventListener("click", closeLoginModal);
   document.getElementById("login-overlay")?.addEventListener("click", closeLoginModal);
   document.getElementById("btn-login-submit")?.addEventListener("click", performLogin);
@@ -257,10 +255,7 @@ function applyFilterSheet() {
   }
 
   function updateAccountFabVisibility() {
-    const fab = document.getElementById("fab-group");
-    if (!fab) return;
-
-    fab.classList.toggle("hidden", isLoggedIn);
+    // FABは常に表示（未ログイン時はログインモーダル、ログイン時はアカウントタブへ）
   }
 
   async function performLogin() {
