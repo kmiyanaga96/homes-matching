@@ -150,3 +150,39 @@
   font-size: 11px;
   letter-spacing: 0.02em;
 }
+
+/* =========================
+   Header Tabs (timeline-like)
+========================= */
+.header-tabs {
+  margin-top: 10px;
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12); /* slate-900薄め */
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(15, 23, 42, 0.55);
+  background: transparent;
+  position: relative;
+  letter-spacing: 0.02em;
+}
+
+.tab-btn.active {
+  color: rgba(15, 23, 42, 0.92);
+}
+
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+}

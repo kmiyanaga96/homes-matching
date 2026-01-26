@@ -186,28 +186,19 @@ function applyFilterSheet() {
   }
 
 
-  function applyTabUI(tab) {
-    const tSearch = document.getElementById("tab-search");
-    const tAccount = document.getElementById("tab-account");
+  function setActiveTab(tab) {
+  const tSearch = document.getElementById("tab-search");
+  const tAccount = document.getElementById("tab-account");
+  if (!tSearch || !tAccount) return;
 
-    const vSearch = document.getElementById("view-search");
-    const vAccount = document.getElementById("view-account");
+  const isSearch = tab === "search";
 
-    const isSearch = tab === "search";
+  tSearch.classList.toggle("is-active", isSearch);
+  tAccount.classList.toggle("is-active", !isSearch);
 
-    tSearch?.classList.toggle("bg-slate-800", isSearch);
-    tSearch?.classList.toggle("text-white", isSearch);
-    tSearch?.classList.toggle("bg-slate-100", !isSearch);
-    tSearch?.classList.toggle("text-slate-500", !isSearch);
-
-    tAccount?.classList.toggle("bg-slate-800", !isSearch);
-    tAccount?.classList.toggle("text-white", !isSearch);
-    tAccount?.classList.toggle("bg-slate-100", isSearch);
-    tAccount?.classList.toggle("text-slate-500", isSearch);
-
-    vSearch?.classList.toggle("hidden", !isSearch);
-    vAccount?.classList.toggle("hidden", isSearch);
-  }
+  tSearch.setAttribute("aria-selected", isSearch ? "true" : "false");
+  tAccount.setAttribute("aria-selected", !isSearch ? "true" : "false");
+}
 
   function goTab(tab) {
     setActiveTab(tab);
