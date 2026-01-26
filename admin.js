@@ -1,5 +1,3 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbz8uRbvgYokCEfeK5LajVDBuSNn6ZnfmL1ZuCaF44nTmQ7PfL4OFVdecrdTRwXO6_8Y/exec";
-
 const passInput = document.getElementById("admin-pass"); // ※現状は未使用（将来adminPass導入用）
 const titleInput = document.getElementById("notice-title");
 const bodyInput = document.getElementById("notice-body");
@@ -12,8 +10,7 @@ const listEl = document.getElementById("notice-list");
 ===================== */
 async function fetchNotices() {
   try {
-    const res = await fetch(`${API_URL}?type=notices&mode=admin`);
-    const data = await res.json();
+    const data = await API.getNoticesAdmin();
     renderNotices(Array.isArray(data) ? data : []);
   } catch (e) {
     console.error(e);
@@ -100,20 +97,14 @@ async function submitNotice() {
   }
 
   const payload = {
-    type: "notices",
     title,
     body,
     isActive: !!publicInput.checked,
     isImportant: !!importantInput.checked
-    // adminPass: passInput.value (将来導入時)
   };
 
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
+    const data = await API.createNotice(payload);
 
     if (!data.success) {
       alert(data.message || "失敗");
@@ -141,7 +132,7 @@ async function toggleActiveFromButton(btn) {
   const next = btn?.dataset?.next;
   if (!id) return;
 
-  await updateNotice({ id, isActive: next });
+  await updateNotice(id, { isActive: next === "true" });
 }
 
 async function toggleImportantFromButton(btn) {
@@ -149,18 +140,12 @@ async function toggleImportantFromButton(btn) {
   const next = btn?.dataset?.next;
   if (!id) return;
 
-  await updateNotice({ id, isImportant: next });
+  await updateNotice(id, { isImportant: next === "true" });
 }
 
-async function updateNotice(fields) {
-  const payload = { type: "notices_update", ...fields };
-
+async function updateNotice(id, fields) {
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
+    const data = await API.updateNotice(id, fields);
 
     if (!data.success) {
       alert(data.message || "失敗");
@@ -183,14 +168,8 @@ async function deleteNoticeFromButton(btn) {
 
   if (!confirm("このお知らせを削除しますか？")) return;
 
-  const payload = { type: "notices_delete", id };
-
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
+    const data = await API.deleteNotice(id);
 
     if (!data.success) {
       alert(data.message || "失敗");

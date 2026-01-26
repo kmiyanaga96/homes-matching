@@ -90,22 +90,85 @@ const API = {
 
   /* ----- Notices ----- */
 
-  // Get all notices
+  // Get public notices (for users)
   async getNotices() {
     try {
       const snapshot = await db.collection(COLLECTIONS.notices)
+        .where("isActive", "==", true)
         .orderBy("createdAt", "desc")
         .limit(20)
         .get();
       return snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
-        // Convert Firestore Timestamp to ISO string
         createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || null
       }));
     } catch (e) {
       console.error("[API] getNotices error:", e);
       throw e;
+    }
+  },
+
+  // Get all notices (for admin)
+  async getNoticesAdmin() {
+    try {
+      const snapshot = await db.collection(COLLECTIONS.notices)
+        .orderBy("createdAt", "desc")
+        .get();
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || null
+      }));
+    } catch (e) {
+      console.error("[API] getNoticesAdmin error:", e);
+      throw e;
+    }
+  },
+
+  // Create notice
+  async createNotice(data) {
+    try {
+      const docRef = await db.collection(COLLECTIONS.notices).add({
+        title: data.title || "",
+        body: data.body || "",
+        isActive: !!data.isActive,
+        isImportant: !!data.isImportant,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createNotice error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  // Update notice
+  async updateNotice(id, fields) {
+    try {
+      const docRef = db.collection(COLLECTIONS.notices).doc(id);
+      const updateData = {};
+      if (fields.isActive !== undefined) updateData.isActive = fields.isActive;
+      if (fields.isImportant !== undefined) updateData.isImportant = fields.isImportant;
+      if (fields.title !== undefined) updateData.title = fields.title;
+      if (fields.body !== undefined) updateData.body = fields.body;
+
+      await docRef.update(updateData);
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateNotice error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  // Delete notice
+  async deleteNotice(id) {
+    try {
+      await db.collection(COLLECTIONS.notices).doc(id).delete();
+      return { success: true };
+    } catch (e) {
+      console.error("[API] deleteNotice error:", e);
+      return { success: false, message: "エラーが発生しました" };
     }
   }
 };
