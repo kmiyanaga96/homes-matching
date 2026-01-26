@@ -154,8 +154,9 @@ function applyFilterSheet() {
 
   document.getElementById("tab-search")?.addEventListener("click", () => goTab("search"));
   document.getElementById("tab-account")?.addEventListener("click", () => goTab("account"));
-  
+
   document.getElementById("btn-login-open")?.addEventListener("click", () => {
+    if (isMenuOpen) toggleMenu();
     if (!isLoggedIn) {
       openLoginModal();
       return;
