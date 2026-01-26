@@ -246,8 +246,7 @@ async function handleFinalize() {
   }
 
   try {
-    const resp = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-    const res = await resp.json();
+    const res = await API.saveMember(payload);
     alert(res.message);
 
     if (res.success) {
@@ -255,7 +254,7 @@ async function handleFinalize() {
       fetchMembers();
     }
   } catch (e) {
-    console.error(e);
+    console.error("[handleFinalize]", e);
     alert("失敗");
   }
 
@@ -349,8 +348,7 @@ async function saveAccount() {
   }
 
   try {
-    const resp = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-    const res = await resp.json();
+    const res = await API.saveMember(payload);
     alert(res.message || (res.success ? "保存しました" : "失敗"));
 
     if (res.success) {

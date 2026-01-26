@@ -8,24 +8,16 @@ function isUnreadNotice(n) {
 }
 
 /* =========================
-   Notices (GAS)
+   Notices (Firebase)
 ========================= */
 async function fetchNotices() {
   try {
-    const resp = await fetch(`${API_URL}?type=notices`);
-    const data = await resp.json();
-
-    if (Array.isArray(data)) {
-      notices = data;
-    } else {
-      notices = [];
-      console.warn("notices response:", data);
-    }
-
+    notices = await API.getNotices();
     renderNotices();
     updateNoticeDot();
   } catch (e) {
-    console.error(e);
+    console.error("[fetchNotices]", e);
+    notices = [];
   }
 }
 

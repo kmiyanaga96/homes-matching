@@ -159,12 +159,10 @@
     }
 
     try {
-      const resp = await fetch(API_URL);
-      const members = await resp.json();
+      const result = await API.verifyMember(id, pass);
 
-      const me = Array.isArray(members) ? members.find(m => String(m.id) === String(id)) : null;
-
-      if (!me) {
+      if (!result.exists) {
+        // New user - allow login and redirect to account setup
         setLoggedIn(true);
         setAuth(id, pass);
         sessionStorage.setItem("homes_login_id", id);
@@ -176,24 +174,12 @@
         return;
       }
 
-      const payload = {
-        id,
-        pass,
-        name: me.name || "",
-        grade: me.grade || "",
-        part: me.part || "",
-        status: me.status || "",
-        comment: me.comment || ""
-      };
-
-      const post = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
-      const res = await post.json();
-
-      if (!res?.success) {
-        alert(res?.message || "ログイン失敗");
+      if (!result.valid) {
+        alert("パスワードが違います");
         return;
       }
 
+      // Existing user with correct password
       setLoggedIn(true);
       setAuth(id, pass);
       sessionStorage.setItem("homes_login_id", id);
@@ -204,7 +190,7 @@
       updateAccountFabVisibility();
       goTab("search");
     } catch (e) {
-      console.error(e);
+      console.error("[performLogin]", e);
       alert("ログイン失敗");
     } finally {
       if (btn) {
