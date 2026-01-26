@@ -125,7 +125,7 @@ function renderMembers(displayList) {
           <p class="text-[10px] text-orange-400 font-bold mb-1">● ${statusDisplay || "未設定"}</p>
           <div class="comment-area">
             <p class="text-xs text-slate-500 leading-relaxed">
-              ${m.comment || "よろしくお願いします！"}
+              ${m.comment || "イエッタイガー！"}
             </p>
           </div>
         </div>
@@ -166,3 +166,4 @@ function toggleFavFilter() {
 
   applyFilters();
 }
+
