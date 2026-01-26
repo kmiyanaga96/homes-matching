@@ -3,33 +3,136 @@ function togglePart(btn) {
   updatePreview();
 }
 
+// toggleStatusChip removed (duplicate)
+
+/* Dynamic chips generation for Edit Modal & Account Tab */
+function initEditModalStatuses() {
+  renderEditModalChips();
+  renderAccountTabChips();
+
+  // Bind grade change listeners
+  const editGrade = document.getElementById("edit-grade");
+  if (editGrade) {
+    editGrade.addEventListener("change", () => {
+      renderEditModalChips();
+      updatePreview();
+    });
+  }
+
+  document.getElementById("acc-grade")?.addEventListener("change", renderAccountTabChips);
+
+  // Bind name input for preview fallback
+  document.getElementById("edit-name")?.addEventListener("input", updatePreview);
+}
+
+function getAllowedEvents(grade, allVisible) {
+  if (grade === "OB/OG") {
+    // Only Satsuki, Tsukimi, Xmas, and Rest(0)
+    // Satsuki(5), Tsukimi(10), Xmas(12)
+    const allowedNames = ["皐月", "月見", "クリラ", "お休み"];
+    return allVisible.filter(ev => allowedNames.includes(ev.name));
+  }
+  return allVisible;
+}
+
+function renderEditModalChips() {
+  const container = document.getElementById("status-chips");
+  if (!container) return;
+
+  // Remember currently active values to preserve them if possible?
+  // Or clear them? If switching to OBOG, invalid ones should be removed.
+  // For simplicity, we just rebuild. User has to reselect if they change grade.
+  // Ideally we preserve valid ones.
+  const currentActive = getActiveChips(".status-chip.active").split("/").filter(Boolean); // Function from editModal but it's local? 
+  // Wait, getActiveChips is defined below. 
+
+  // Actually, simply rebuilding is safest.
+
+  const grade = document.getElementById("edit-grade")?.value || "1";
+  const visible = getVisibleEvents();
+  const allowed = getAllowedEvents(grade, visible);
+
+  container.innerHTML = "";
+  allowed.forEach(ev => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
+    // If previously selected and still allowed, keep active?
+    // Need complex logic or just let user reselect.
+    // Re-selecting is safer UI behavior when constraints change.
+
+    btn.dataset.value = ev.name;
+    btn.dataset.type = ev.type;
+    btn.textContent = ev.name;
+    btn.onclick = () => toggleStatusChip(btn);
+    container.appendChild(btn);
+  });
+}
+
+
+function renderAccountTabChips() {
+  const container = document.getElementById("acc-status-chips");
+  if (!container) return;
+
+  const grade = document.getElementById("acc-grade")?.value || "1";
+  const visible = getVisibleEvents();
+  const allowed = getAllowedEvents(grade, visible);
+
+  container.innerHTML = "";
+  allowed.forEach(ev => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
+    btn.dataset.value = ev.name;
+    btn.dataset.type = ev.type;
+    btn.textContent = ev.name;
+    btn.onclick = () => toggleAccountStatusChip(btn);
+    container.appendChild(btn);
+  });
+}
+
+function toggleAccountStatusChip(btn) {
+  btn.classList.toggle("active");
+  updateAccountChipStyle(btn);
+}
+
+function updateAccountChipStyle(btn) {
+  const type = btn.dataset.type || "others";
+  const colors = EVENT_COLORS[type] || EVENT_COLORS.others;
+
+  if (btn.classList.contains("active")) {
+    // Apply active styles - MUST include 'active' class so it can be toggled off!
+    btn.className = `acc-status-chip active px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${colors.active} ${colors.text} ${colors.border} ${colors.ring || ""}`;
+  } else {
+    // Revert
+    btn.className = `acc-status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
+  }
+}
+
+// Enhance the toggle functions to apply colors based on data-type?
+// Currently existing CSS likely handles `.active`. 
+// If I want custom colors for active state without writing 13 CSS rules, I can do it in JS.
+function updateChipStyle(btn) {
+  const type = btn.dataset.type || "others";
+  const colors = EVENT_COLORS[type] || EVENT_COLORS.others;
+
+  if (btn.classList.contains("active")) {
+    // Apply active styles - MUST include 'active' class
+    btn.className = `status-chip active px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${colors.active} ${colors.text} ${colors.border} ${colors.ring || ""}`;
+  } else {
+    // Revert to default
+    btn.className = `status-chip px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all`;
+  }
+}
+// Override toggleStatusChip to use style update
 function toggleStatusChip(btn) {
   btn.classList.toggle("active");
+  updateChipStyle(btn); // Apply color
   updatePreview();
 }
 
 /* =========================
    動的ステータスチップ生成
-========================= */
-function renderStatusChips(containerId, chipClass, withOnclick = false) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-
-  const availableEvents = getAvailableEvents();
-  container.innerHTML = availableEvents.map(e => {
-    const onclick = withOnclick ? `onclick="toggleStatusChip(this)"` : "";
-    return `<button type="button" ${onclick}
-      class="${chipClass} px-2.5 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-[10px] font-bold border border-transparent transition-all"
-      data-value="${e.label}">${e.label}</button>`;
-  }).join("");
-
-  // イベントリスナーを再バインド（onclick不使用の場合）
-  if (!withOnclick) {
-    container.querySelectorAll(`.${chipClass}`).forEach(b => {
-      b.addEventListener("click", () => b.classList.toggle("active"));
-    });
-  }
-}
 
 function openEditModal() {
   const modal = document.getElementById("edit-modal");
@@ -66,12 +169,21 @@ function closeEditModal() {
 
 function updatePreview() {
   const id = document.getElementById("edit-auth-id")?.value || "";
+  const name = document.getElementById("edit-name")?.value || "";
+  const grade = document.getElementById("edit-grade")?.value || "";
   const preview = document.getElementById("edit-preview-card");
+
   if (!preview) return;
+
+  const iconUrl = `https://unavatar.io/twitter/${id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(name || "ID")}`;
+  const beginnerMark = grade === "1" ? `<span class="absolute -top-1 -left-1 text-sm filter drop-shadow-md z-10">🔰</span>` : "";
 
   preview.innerHTML = `
     <div class="flex items-center space-x-2 p-2">
-      <div class="w-9 h-9 rounded-full bg-slate-200"></div>
+      <div class="relative">
+        ${beginnerMark}
+        <img src="${iconUrl}" class="w-9 h-9 rounded-full bg-slate-200 object-cover">
+      </div>
       <div class="min-w-0">
         <div class="text-[10px] font-bold text-slate-600">@${id || "ID"}</div>
         <div class="text-[9px] text-slate-400">プレビュー</div>
@@ -140,7 +252,17 @@ function setChipsActive(selector, valuesStr) {
   const values = String(valuesStr || "").split("/").filter(Boolean);
   document.querySelectorAll(selector).forEach((btn) => {
     const v = btn.dataset.value;
-    btn.classList.toggle("active", values.includes(v));
+    const isActive = values.includes(v);
+    btn.classList.toggle("active", isActive);
+
+    // Auto-update style if it's a dynamic chip
+    // We check if it has 'acc-status-chip' or 'status-chip' class to decide which updater to call?
+    // Or just check if `updateAccountChipStyle` exists and applies?
+    if (btn.classList.contains("acc-status-chip") && typeof updateAccountChipStyle === "function") {
+      updateAccountChipStyle(btn);
+    } else if (btn.classList.contains("status-chip") && typeof updateChipStyle === "function") {
+      updateChipStyle(btn);
+    }
   });
 }
 

@@ -59,6 +59,45 @@ function partRank(partStr) {
   return best;
 }
 
+/* ===== Event / Status Helpers ===== */
+function getVisibleEvents() {
+  const now = new Date();
+  const currentMonth = now.getMonth() + 1; // 1-12
+
+  // 6 months window
+  const months = [];
+  for (let i = 0; i < 6; i++) {
+    let m = currentMonth + i;
+    if (m > 12) m -= 12;
+    months.push(m);
+  }
+
+  // Filter events: Check if month is in window OR month is 0 (always visible 'Rest')
+  let visible = EVENT_DEFINITIONS.filter(ev => ev.month === 0 || months.includes(ev.month));
+
+  // Sort Logic: Chronological from Current Month
+  // 1. Calculate distance for each (0-based)
+  // 2. 'Rest' (0) goes to bottom (distance 999)
+  visible.sort((a, b) => {
+    const distA = a.month === 0 ? 999 : (a.month - currentMonth + 12) % 12;
+    const distB = b.month === 0 ? 999 : (b.month - currentMonth + 12) % 12;
+    // Note: If months are the same, preserve original order? But names are unique usually.
+    return distA - distB;
+  });
+
+  return visible;
+}
+
+function getEventDef(name) {
+  return EVENT_DEFINITIONS.find(e => e.name === name);
+}
+
+function getEventColor(name) {
+  const def = getEventDef(name);
+  if (!def) return EVENT_COLORS.others; // Default fallback
+  return EVENT_COLORS[def.type] || EVENT_COLORS.others;
+}
+
 function updatedAtToTime(m) {
   const d = toDateSafe(m.updatedAt);
   return d ? d.getTime() : 0;
