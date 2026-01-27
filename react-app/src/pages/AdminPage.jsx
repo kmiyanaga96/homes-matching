@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { API } from '../lib/api';
-import { ROLES, ROLE_KEYS, GROUPS, PARTS } from '../lib/constants';
+import { ROLES, ROLE_KEYS, GROUPS, PARTS, EVENT_TYPES } from '../lib/constants';
 
 const ADMIN_TABS = [
   { key: 'notices', label: 'お知らせ管理' },
   { key: 'members', label: 'メンバー一覧' },
   { key: 'roles', label: '役職付与' },
+  { key: 'events', label: 'イベント管理' },
 ];
 
 export default function AdminPage() {
@@ -45,6 +46,7 @@ export default function AdminPage() {
       {activeTab === 'notices' && <NoticesSection />}
       {activeTab === 'members' && <MembersSection />}
       {activeTab === 'roles' && <RolesSection />}
+      {activeTab === 'events' && <EventsAdminSection />}
     </div>
   );
 }
@@ -407,6 +409,83 @@ function RolesSection() {
           >
             {saving ? '保存中...' : '保存'}
           </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ========== イベント管理 ========== */
+function EventsAdminSection() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => { fetchEvents(); }, []);
+
+  async function fetchEvents() {
+    setLoading(true);
+    try {
+      const data = await API.getEvents();
+      data.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      setEvents(data);
+    } catch (e) {
+      console.error('[fetchEvents]', e);
+    }
+    setLoading(false);
+  }
+
+  async function handleDelete(ev) {
+    if (!confirm(`「${ev.name}」を削除しますか？`)) return;
+    try {
+      const result = await API.deleteEvent(ev.id);
+      if (result.success) fetchEvents();
+    } catch (e) {
+      console.error('[deleteEvent]', e);
+    }
+  }
+
+  if (loading) {
+    return <div className="text-center py-8 text-slate-500">読み込み中...</div>;
+  }
+
+  return (
+    <>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-bold text-slate-700">全イベント ({events.length}件)</h3>
+        <button onClick={fetchEvents} className="text-xs text-slate-500 hover:underline">更新</button>
+      </div>
+      {events.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow p-6 text-center">
+          <p className="text-sm text-slate-500">イベントがありません</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {events.map(ev => {
+            const dateStr = ev.date ? new Date(ev.date).toLocaleDateString('ja-JP', {
+              year: 'numeric', month: 'short', day: 'numeric'
+            }) : '';
+            return (
+              <div key={ev.id} className="bg-white rounded-xl shadow p-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                        ev.type === 'live' ? 'bg-red-100 text-red-600' : 'bg-sky-100 text-sky-600'
+                      }`}>
+                        {EVENT_TYPES[ev.type] || ev.type}
+                      </span>
+                      <span className="font-bold text-sm text-slate-800">{ev.name}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-500">{dateStr} {ev.location && `| ${ev.location}`}</p>
+                  </div>
+                  <button onClick={() => handleDelete(ev)}
+                    className="text-[10px] px-2 py-1 text-rose-500 hover:underline shrink-0">
+                    削除
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </>
