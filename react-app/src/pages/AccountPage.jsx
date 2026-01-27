@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { API } from '../lib/api';
+import { requestFCMToken } from '../lib/firebase';
 import { getVisibleEvents, getEventColor, PARTS, GRADES } from '../lib/constants';
 
 export default function AccountPage() {
@@ -214,6 +215,74 @@ export default function AccountPage() {
           {saving ? '保存中...' : '保存'}
         </button>
       </div>
+
+      {/* Notification Settings */}
+      <NotificationSettings memberId={auth.id} />
+    </div>
+  );
+}
+
+function NotificationSettings({ memberId }) {
+  const [permission, setPermission] = useState(
+    typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+  );
+  const [loading, setLoading] = useState(false);
+
+  async function handleEnable() {
+    setLoading(true);
+    try {
+      const result = await Notification.requestPermission();
+      setPermission(result);
+      if (result === 'granted') {
+        const token = await requestFCMToken();
+        if (token) {
+          await API.saveFCMToken(memberId, token);
+          alert('通知をONにしました');
+        } else {
+          alert('トークン取得に失敗しました。ブラウザが対応していない可能性があります。');
+        }
+      }
+    } catch (e) {
+      console.error('[enableNotification]', e);
+      alert('通知の設定に失敗しました');
+    }
+    setLoading(false);
+  }
+
+  async function handleDisable() {
+    setLoading(true);
+    try {
+      await API.removeFCMToken(memberId);
+      alert('通知をOFFにしました');
+    } catch (e) {
+      console.error('[disableNotification]', e);
+    }
+    setLoading(false);
+  }
+
+  if (permission === 'unsupported') return null;
+
+  return (
+    <div className="bg-white rounded-2xl shadow p-4 mt-4">
+      <h3 className="font-bold text-slate-800 mb-3">プッシュ通知</h3>
+      {permission === 'granted' ? (
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-lime-700 font-bold">通知ON</span>
+          <button onClick={handleDisable} disabled={loading}
+            className="text-xs px-4 py-2 bg-slate-200 text-slate-600 rounded-lg font-bold disabled:opacity-50">
+            {loading ? '...' : 'OFFにする'}
+          </button>
+        </div>
+      ) : permission === 'denied' ? (
+        <p className="text-sm text-slate-500">
+          通知がブロックされています。ブラウザの設定から通知を許可してください。
+        </p>
+      ) : (
+        <button onClick={handleEnable} disabled={loading}
+          className="w-full py-2 bg-lime-500 text-white rounded-xl font-bold text-sm disabled:opacity-50">
+          {loading ? '設定中...' : '通知をONにする'}
+        </button>
+      )}
     </div>
   );
 }

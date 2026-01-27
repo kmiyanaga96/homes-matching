@@ -591,6 +591,36 @@ export const API = {
     }
   },
 
+  /* ----- FCM Tokens (v1.0.0) ----- */
+
+  async saveFCMToken(memberId, token) {
+    try {
+      const docRef = doc(db, COLLECTIONS.members, memberId);
+      await updateDoc(docRef, {
+        fcmToken: token,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] saveFCMToken error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async removeFCMToken(memberId) {
+    try {
+      const docRef = doc(db, COLLECTIONS.members, memberId);
+      await updateDoc(docRef, {
+        fcmToken: "",
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] removeFCMToken error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
   async getSetlistsByEvent(eventId) {
     try {
       const q = query(

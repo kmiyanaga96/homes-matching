@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { onForegroundMessage } from './lib/firebase';
 import Layout from './components/Layout';
 import SearchPage from './pages/SearchPage';
 import EventsPage from './pages/EventsPage';
@@ -13,6 +14,18 @@ import './index.css';
 
 function AppContent() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  useEffect(() => {
+    let unsubscribe;
+    onForegroundMessage((payload) => {
+      console.log('[FCM] Foreground message:', payload);
+      const { title, body } = payload.notification || {};
+      if (title && Notification.permission === 'granted') {
+        new Notification(title, { body: body || '', icon: '/homes-logo.png' });
+      }
+    }).then(unsub => { unsubscribe = unsub; });
+    return () => { if (unsubscribe) unsubscribe(); };
+  }, []);
 
   return (
     <>
