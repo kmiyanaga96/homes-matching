@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Layout from './components/Layout';
 import SearchPage from './pages/SearchPage';
-import LivePage from './pages/LivePage';
+import EventsPage from './pages/EventsPage';
 import SchedulePage from './pages/SchedulePage';
 import NoticesPage from './pages/NoticesPage';
 import AccountPage from './pages/AccountPage';
@@ -20,7 +20,7 @@ function AppContent() {
         <Route path="/" element={<Layout onLoginClick={() => setLoginModalOpen(true)} />}>
           <Route index element={<Navigate to="/search" replace />} />
           <Route path="search" element={<SearchPage />} />
-          <Route path="live" element={<LivePage />} />
+          <Route path="events" element={<EventsPage />} />
           <Route path="schedule" element={<SchedulePage />} />
           <Route path="notices" element={<NoticesPage />} />
           <Route path="account" element={<AccountPage />} />

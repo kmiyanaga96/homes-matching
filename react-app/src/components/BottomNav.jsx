@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 const tabs = [
   { path: '/search', label: '検索', icon: SearchIcon },
-  { path: '/live', label: 'ライブ', icon: LiveIcon },
+  { path: '/events', label: 'イベント', icon: LiveIcon },
   { path: '/schedule', label: '予定', icon: ScheduleIcon },
   { path: '/notices', label: 'お知らせ', icon: NoticeIcon },
   { path: '/account', label: 'アカウント', icon: AccountIcon, requireAuth: true },

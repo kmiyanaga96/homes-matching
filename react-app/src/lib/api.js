@@ -234,4 +234,127 @@ export const API = {
       throw e;
     }
   },
+
+  /* ----- Bands (v1.0.0) ----- */
+
+  async createBand(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.bands), {
+        name: data.name,
+        members: data.members, // [{id, name, part}]
+        equipment: data.equipment || "",
+        comment: data.comment || "",
+        status: "recruiting", // recruiting | closed
+        createdBy: data.createdBy,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createBand error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getBands() {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.bands),
+        orderBy("updatedAt", "desc")
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => {
+        const data = d.data();
+        return {
+          id: d.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+          updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+        };
+      });
+    } catch (e) {
+      console.error("[API] getBands error:", e);
+      throw e;
+    }
+  },
+
+  async getBand(id) {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.bands, id));
+      if (!docSnap.exists()) return null;
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+        updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+      };
+    } catch (e) {
+      console.error("[API] getBand error:", e);
+      throw e;
+    }
+  },
+
+  async updateBand(id, fields) {
+    try {
+      const docRef = doc(db, COLLECTIONS.bands, id);
+      await updateDoc(docRef, {
+        ...fields,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateBand error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- Band Requests (v1.0.0) ----- */
+
+  async createBandRequest(bandId, applicantId, applicantName, applicantPart) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.bandRequests), {
+        bandId,
+        applicantId,
+        applicantName,
+        applicantPart,
+        status: "pending", // pending | approved | rejected
+        createdAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createBandRequest error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getBandRequests(bandId) {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.bandRequests),
+        where("bandId", "==", bandId),
+        where("status", "==", "pending")
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null,
+      }));
+    } catch (e) {
+      console.error("[API] getBandRequests error:", e);
+      throw e;
+    }
+  },
+
+  async updateBandRequest(requestId, status) {
+    try {
+      const docRef = doc(db, COLLECTIONS.bandRequests, requestId);
+      await updateDoc(docRef, { status });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateBandRequest error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
 };

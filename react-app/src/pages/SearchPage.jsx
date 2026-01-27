@@ -1,9 +1,45 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { API } from '../lib/api';
-import { getVisibleEvents, getEventColor, PARTS, GRADES } from '../lib/constants';
+import { getVisibleEvents, getEventColor, PARTS, GRADES, BAND_STATUS } from '../lib/constants';
 import MemberCard from '../components/MemberCard';
+import BandCard from '../components/BandCard';
+import BandDetailModal from '../components/BandDetailModal';
+import BandCreateModal from '../components/BandCreateModal';
 
 export default function SearchPage() {
+  const [subTab, setSubTab] = useState('member');
+
+  return (
+    <div className="py-4">
+      {/* Sub Tab */}
+      <div className="flex gap-1 mb-4 bg-slate-100 rounded-xl p-1">
+        <button
+          onClick={() => setSubTab('member')}
+          className={`flex-1 py-2 text-sm font-bold rounded-lg transition ${
+            subTab === 'member' ? 'bg-white text-slate-800 shadow' : 'text-slate-500'
+          }`}
+        >
+          メンバー検索
+        </button>
+        <button
+          onClick={() => setSubTab('band')}
+          className={`flex-1 py-2 text-sm font-bold rounded-lg transition ${
+            subTab === 'band' ? 'bg-white text-slate-800 shadow' : 'text-slate-500'
+          }`}
+        >
+          バンド検索
+        </button>
+      </div>
+
+      {subTab === 'member' && <MemberSearchTab />}
+      {subTab === 'band' && <BandSearchTab />}
+    </div>
+  );
+}
+
+/* ========== メンバー検索 ========== */
+function MemberSearchTab() {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchName, setSearchName] = useState('');
@@ -20,17 +56,9 @@ export default function SearchPage() {
 
   const visibleEvents = useMemo(() => getVisibleEvents(), []);
 
-  useEffect(() => {
-    fetchMembers();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('sort_mode', sortMode);
-  }, [sortMode]);
-
-  useEffect(() => {
-    localStorage.setItem('fav_members', JSON.stringify(favorites));
-  }, [favorites]);
+  useEffect(() => { fetchMembers(); }, []);
+  useEffect(() => { localStorage.setItem('sort_mode', sortMode); }, [sortMode]);
+  useEffect(() => { localStorage.setItem('fav_members', JSON.stringify(favorites)); }, [favorites]);
 
   async function fetchMembers() {
     setLoading(true);
@@ -45,9 +73,7 @@ export default function SearchPage() {
 
   const toggleFavorite = (id) => {
     setFavorites(prev =>
-      prev.includes(id)
-        ? prev.filter(f => f !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
     );
   };
 
@@ -70,7 +96,6 @@ export default function SearchPage() {
       return matchName && matchPart && matchGrade && matchStatus && hasVisibleStatus && matchFav;
     });
 
-    // Sort
     const gradeToNumber = (g) => {
       if (String(g).trim() === 'OB/OG') return 5;
       const n = Number(g);
@@ -121,7 +146,7 @@ export default function SearchPage() {
   }, [members, searchName, filterPart, filterGrade, filterStatus, sortMode, favFilterActive, favorites, visibleEvents]);
 
   return (
-    <div className="py-4">
+    <>
       {/* Search & Filters */}
       <div className="bg-white rounded-2xl shadow p-4 mb-4">
         <input
@@ -211,6 +236,145 @@ export default function SearchPage() {
           ))}
         </div>
       )}
-    </div>
+    </>
+  );
+}
+
+/* ========== バンド検索 ========== */
+function BandSearchTab() {
+  const { isLoggedIn } = useAuth();
+  const [bands, setBands] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchName, setSearchName] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [sortMode, setSortMode] = useState('updatedDesc');
+  const [selectedBand, setSelectedBand] = useState(null);
+  const [showCreate, setShowCreate] = useState(false);
+
+  useEffect(() => { fetchBands(); }, []);
+
+  async function fetchBands() {
+    setLoading(true);
+    try {
+      const data = await API.getBands();
+      setBands(data);
+    } catch (e) {
+      console.error('[fetchBands]', e);
+    }
+    setLoading(false);
+  }
+
+  const filteredBands = useMemo(() => {
+    const nameVal = searchName.toLowerCase();
+
+    let filtered = bands.filter(b => {
+      const matchName = b.name.toLowerCase().includes(nameVal) ||
+        (b.members || []).some(m => (m.name || '').toLowerCase().includes(nameVal));
+      const matchStatus = filterStatus === '' || b.status === filterStatus;
+      return matchName && matchStatus;
+    });
+
+    if (sortMode === 'updatedDesc') {
+      filtered.sort((a, b) => {
+        const ta = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const tb = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return tb - ta;
+      });
+    } else if (sortMode === 'nameAsc') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+    } else if (sortMode === 'membersDesc') {
+      filtered.sort((a, b) => (b.members || []).length - (a.members || []).length);
+    }
+
+    return filtered;
+  }, [bands, searchName, filterStatus, sortMode]);
+
+  async function handleBandUpdated() {
+    await fetchBands();
+    // 更新後に選択中のバンドも再取得
+    if (selectedBand) {
+      const updated = await API.getBand(selectedBand.id);
+      setSelectedBand(updated);
+    }
+  }
+
+  return (
+    <>
+      {/* Search & Filters */}
+      <div className="bg-white rounded-2xl shadow p-4 mb-4">
+        <input
+          type="text"
+          placeholder="バンド名・メンバー名で検索..."
+          value={searchName}
+          onChange={e => setSearchName(e.target.value)}
+          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm mb-3"
+        />
+
+        <div className="flex gap-2 mb-3">
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value)}
+            className="flex-1 px-2 py-1.5 border border-slate-200 rounded-lg text-sm"
+          >
+            <option value="">すべて</option>
+            <option value="recruiting">募集中</option>
+            <option value="closed">〆</option>
+          </select>
+
+          <select
+            value={sortMode}
+            onChange={e => setSortMode(e.target.value)}
+            className="flex-1 px-2 py-1.5 border border-slate-200 rounded-lg text-sm"
+          >
+            <option value="updatedDesc">最終更新順</option>
+            <option value="nameAsc">名前順</option>
+            <option value="membersDesc">人数順</option>
+          </select>
+        </div>
+
+        {isLoggedIn && (
+          <button
+            onClick={() => setShowCreate(true)}
+            className="w-full py-2 bg-lime-500 text-white rounded-xl font-bold text-sm"
+          >
+            + バンド作成
+          </button>
+        )}
+      </div>
+
+      {/* Results */}
+      {loading ? (
+        <div className="text-center py-8 text-slate-500">読み込み中...</div>
+      ) : filteredBands.length === 0 ? (
+        <div className="text-center py-8 text-slate-500">
+          該当するバンドがありません
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredBands.map(band => (
+            <BandCard
+              key={band.id}
+              band={band}
+              onTap={setSelectedBand}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Modals */}
+      {selectedBand && (
+        <BandDetailModal
+          band={selectedBand}
+          onClose={() => setSelectedBand(null)}
+          onUpdated={handleBandUpdated}
+        />
+      )}
+      {showCreate && (
+        <BandCreateModal
+          onClose={() => setShowCreate(false)}
+          onCreated={fetchBands}
+        />
+      )}
+    </>
   );
 }
