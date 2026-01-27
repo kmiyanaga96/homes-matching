@@ -1,0 +1,25 @@
+{
+  "name": "ほーむずマッチング",
+  "short_name": "ほーむず",
+  "description": "バンドメンバーマッチングアプリ",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#bef264",
+  "theme_color": "#bef264",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/homes-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/homes-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
