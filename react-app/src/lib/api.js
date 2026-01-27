@@ -543,4 +543,68 @@ export const API = {
       return { success: false, message: "エラーが発生しました" };
     }
   },
+
+  /* ----- Timetables (v1.0.0) ----- */
+
+  async saveTimetable(eventId, slots) {
+    try {
+      const docRef = doc(db, COLLECTIONS.timetables, eventId);
+      await setDoc(docRef, {
+        eventId,
+        slots, // [{startTime, endTime, bandName}]
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] saveTimetable error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getTimetable(eventId) {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.timetables, eventId));
+      if (!docSnap.exists()) return null;
+      return docSnap.data();
+    } catch (e) {
+      console.error("[API] getTimetable error:", e);
+      throw e;
+    }
+  },
+
+  /* ----- Setlists (v1.0.0) ----- */
+
+  async saveSetlist(eventId, bandId, songs) {
+    try {
+      const docId = `${eventId}_${bandId}`;
+      const docRef = doc(db, COLLECTIONS.setlists, docId);
+      await setDoc(docRef, {
+        eventId,
+        bandId,
+        songs, // [{order, title, artist}]
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] saveSetlist error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getSetlistsByEvent(eventId) {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.setlists),
+        where("eventId", "==", eventId)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+      }));
+    } catch (e) {
+      console.error("[API] getSetlistsByEvent error:", e);
+      throw e;
+    }
+  },
 };

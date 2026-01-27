@@ -224,12 +224,32 @@ function EventCreateModal({ onClose, onCreated }) {
 function EventDetailModal({ event, onClose, onUpdated }) {
   const { isLoggedIn, auth, checkPermission } = useAuth();
   const canEdit = checkPermission('eventEdit');
+  const canEditTimetable = checkPermission('timetableEdit');
+  const canEditSetlist = checkPermission('setlistEdit');
   const isLive = event.type === 'live';
   const [entries, setEntries] = useState([]);
   const [loadingEntries, setLoadingEntries] = useState(true);
   const [showEntryForm, setShowEntryForm] = useState(false);
+  const [timetable, setTimetable] = useState(null);
+  const [setlists, setSetlists] = useState([]);
+  const [showTimetableEdit, setShowTimetableEdit] = useState(false);
+  const [showSetlistEdit, setShowSetlistEdit] = useState(false);
 
-  useEffect(() => { fetchEntries(); }, [event.id]);
+  useEffect(() => { fetchEntries(); fetchTimetableAndSetlists(); }, [event.id]);
+
+  async function fetchTimetableAndSetlists() {
+    if (!isLive) return;
+    try {
+      const [tt, sl] = await Promise.all([
+        API.getTimetable(event.id),
+        API.getSetlistsByEvent(event.id),
+      ]);
+      setTimetable(tt);
+      setSetlists(sl);
+    } catch (e) {
+      console.error('[fetchTT/SL]', e);
+    }
+  }
 
   async function fetchEntries() {
     setLoadingEntries(true);
@@ -367,6 +387,89 @@ function EventDetailModal({ event, onClose, onUpdated }) {
               onCreated={() => { setShowEntryForm(false); fetchEntries(); }}
             />
           )}
+
+          {/* Timetable (live only) */}
+          {isLive && (
+            <div className="border-t border-slate-200 pt-4 mt-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-bold text-slate-700">タイムテーブル</h3>
+                {canEditTimetable && (
+                  <button onClick={() => setShowTimetableEdit(!showTimetableEdit)}
+                    className="text-[10px] text-lime-600 font-bold">
+                    {showTimetableEdit ? '閉じる' : '編集'}
+                  </button>
+                )}
+              </div>
+              {showTimetableEdit ? (
+                <TimetableEditForm
+                  eventId={event.id}
+                  initial={timetable}
+                  entries={entries}
+                  onSaved={() => { setShowTimetableEdit(false); fetchTimetableAndSetlists(); }}
+                />
+              ) : timetable && timetable.slots && timetable.slots.length > 0 ? (
+                <div className="space-y-1">
+                  {timetable.slots.map((slot, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs bg-slate-50 rounded-lg px-3 py-2">
+                      <span className="text-slate-500 font-mono">{slot.startTime}~{slot.endTime}</span>
+                      <span className="text-slate-800 font-bold">{slot.bandName}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">未設定</p>
+              )}
+            </div>
+          )}
+
+          {/* Setlists (live only) */}
+          {isLive && (
+            <div className="border-t border-slate-200 pt-4 mt-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-bold text-slate-700">セットリスト</h3>
+                {canEditSetlist && (
+                  <button onClick={() => setShowSetlistEdit(!showSetlistEdit)}
+                    className="text-[10px] text-lime-600 font-bold">
+                    {showSetlistEdit ? '閉じる' : '編集'}
+                  </button>
+                )}
+              </div>
+              {showSetlistEdit ? (
+                <SetlistEditForm
+                  eventId={event.id}
+                  entries={entries}
+                  existingSetlists={setlists}
+                  onSaved={() => { setShowSetlistEdit(false); fetchTimetableAndSetlists(); }}
+                />
+              ) : setlists.length > 0 ? (
+                <div className="space-y-3">
+                  {setlists.map(sl => (
+                    <div key={sl.id}>
+                      <p className="text-xs font-bold text-slate-700 mb-1">
+                        {entries.find(e => e.bandId === sl.bandId)?.bandName || sl.bandId}
+                      </p>
+                      <div className="space-y-0.5">
+                        {(sl.songs || []).map((s, i) => (
+                          <p key={i} className="text-[11px] text-slate-600 pl-2">
+                            {s.order}. {s.title} / {s.artist}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">未設定</p>
+              )}
+            </div>
+          )}
+
+          {/* YouTube URL edit (live only, authorized users) */}
+          {isLive && canEdit && (
+            <div className="border-t border-slate-200 pt-4 mt-4">
+              <YouTubeUrlEditor event={event} onSaved={onUpdated} />
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -503,6 +606,193 @@ function EntryForm({ event, onClose, onCreated }) {
         className="w-full py-2 bg-slate-800 text-white rounded-xl font-bold text-sm disabled:opacity-50">
         {saving ? 'エントリー中...' : 'エントリーする'}
       </button>
+    </div>
+  );
+}
+
+/* ========== タイムテーブル編集 ========== */
+function TimetableEditForm({ eventId, initial, entries, onSaved }) {
+  const bandEntries = entries.filter(e => e.type === 'band' && e.status === 'selected');
+  const [slots, setSlots] = useState(() => {
+    if (initial?.slots?.length) return initial.slots.map(s => ({ ...s }));
+    return bandEntries.map(e => ({ startTime: '', endTime: '', bandName: e.bandName }));
+  });
+  const [saving, setSaving] = useState(false);
+
+  function addSlot() {
+    setSlots(prev => [...prev, { startTime: '', endTime: '', bandName: '' }]);
+  }
+
+  function updateSlot(i, field, value) {
+    setSlots(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: value } : s));
+  }
+
+  function removeSlot(i) {
+    setSlots(prev => prev.filter((_, idx) => idx !== i));
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const result = await API.saveTimetable(eventId, slots);
+      if (result.success) {
+        alert('タイムテーブルを保存しました');
+        onSaved();
+      } else {
+        alert(result.message || '失敗');
+      }
+    } catch (e) {
+      console.error('[saveTimetable]', e);
+      alert('失敗');
+    }
+    setSaving(false);
+  }
+
+  return (
+    <div className="space-y-2">
+      {slots.map((slot, i) => (
+        <div key={i} className="flex gap-1 items-center">
+          <input type="time" value={slot.startTime} onChange={e => updateSlot(i, 'startTime', e.target.value)}
+            className="w-20 px-1 py-1 border border-slate-200 rounded text-xs" />
+          <span className="text-xs text-slate-400">~</span>
+          <input type="time" value={slot.endTime} onChange={e => updateSlot(i, 'endTime', e.target.value)}
+            className="w-20 px-1 py-1 border border-slate-200 rounded text-xs" />
+          <input type="text" value={slot.bandName} onChange={e => updateSlot(i, 'bandName', e.target.value)}
+            placeholder="バンド名" className="flex-1 px-2 py-1 border border-slate-200 rounded text-xs" />
+          <button onClick={() => removeSlot(i)} className="text-rose-400 text-xs">×</button>
+        </div>
+      ))}
+      <button onClick={addSlot} className="text-[10px] text-lime-600 font-bold">+ 枠追加</button>
+      <button onClick={handleSave} disabled={saving}
+        className="w-full py-2 bg-slate-800 text-white rounded-xl font-bold text-sm disabled:opacity-50 mt-2">
+        {saving ? '保存中...' : '保存'}
+      </button>
+    </div>
+  );
+}
+
+/* ========== セットリスト編集 ========== */
+function SetlistEditForm({ eventId, entries, existingSetlists, onSaved }) {
+  const bandEntries = entries.filter(e => e.type === 'band' && e.status === 'selected');
+  const [selectedBandId, setSelectedBandId] = useState(bandEntries[0]?.bandId || '');
+  const [songs, setSongs] = useState([{ order: 1, title: '', artist: '' }]);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!selectedBandId) return;
+    const existing = existingSetlists.find(s => s.bandId === selectedBandId);
+    if (existing?.songs?.length) {
+      setSongs(existing.songs.map(s => ({ ...s })));
+    } else {
+      const entry = bandEntries.find(e => e.bandId === selectedBandId);
+      if (entry?.songs?.length) {
+        setSongs(entry.songs.map(s => ({ ...s })));
+      } else {
+        setSongs([{ order: 1, title: '', artist: '' }]);
+      }
+    }
+  }, [selectedBandId]);
+
+  function addSong() {
+    setSongs(prev => [...prev, { order: prev.length + 1, title: '', artist: '' }]);
+  }
+
+  function updateSong(i, field, value) {
+    setSongs(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: value } : s));
+  }
+
+  function removeSong(i) {
+    setSongs(prev => prev.filter((_, idx) => idx !== i).map((s, idx) => ({ ...s, order: idx + 1 })));
+  }
+
+  async function handleSave() {
+    if (!selectedBandId) return;
+    setSaving(true);
+    try {
+      const result = await API.saveSetlist(eventId, selectedBandId, songs.filter(s => s.title.trim()));
+      if (result.success) {
+        alert('セットリストを保存しました');
+        onSaved();
+      } else {
+        alert(result.message || '失敗');
+      }
+    } catch (e) {
+      console.error('[saveSetlist]', e);
+      alert('失敗');
+    }
+    setSaving(false);
+  }
+
+  if (bandEntries.length === 0) {
+    return <p className="text-xs text-slate-500">当選バンドがありません</p>;
+  }
+
+  return (
+    <div>
+      <select value={selectedBandId} onChange={e => setSelectedBandId(e.target.value)}
+        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm mb-3">
+        {bandEntries.map(e => (
+          <option key={e.bandId} value={e.bandId}>{e.bandName}</option>
+        ))}
+      </select>
+
+      <div className="space-y-2 mb-3">
+        {songs.map((song, i) => (
+          <div key={i} className="flex gap-1 items-center">
+            <span className="text-xs text-slate-500 w-4">{song.order}.</span>
+            <input type="text" value={song.title} onChange={e => updateSong(i, 'title', e.target.value)}
+              placeholder="曲名" className="flex-1 px-2 py-1 border border-slate-200 rounded text-xs" />
+            <input type="text" value={song.artist} onChange={e => updateSong(i, 'artist', e.target.value)}
+              placeholder="アーティスト" className="flex-1 px-2 py-1 border border-slate-200 rounded text-xs" />
+            {songs.length > 1 && (
+              <button onClick={() => removeSong(i)} className="text-rose-400 text-xs">×</button>
+            )}
+          </div>
+        ))}
+        <button onClick={addSong} className="text-[10px] text-lime-600 font-bold">+ 曲追加</button>
+      </div>
+
+      <button onClick={handleSave} disabled={saving}
+        className="w-full py-2 bg-slate-800 text-white rounded-xl font-bold text-sm disabled:opacity-50">
+        {saving ? '保存中...' : '保存'}
+      </button>
+    </div>
+  );
+}
+
+/* ========== YouTube URL 編集 ========== */
+function YouTubeUrlEditor({ event, onSaved }) {
+  const [url, setUrl] = useState(event.youtubeUrl || '');
+  const [saving, setSaving] = useState(false);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const result = await API.updateEvent(event.id, { youtubeUrl: url.trim() });
+      if (result.success) {
+        alert('保存しました');
+        onSaved();
+      } else {
+        alert(result.message || '失敗');
+      }
+    } catch (e) {
+      console.error('[updateYoutubeUrl]', e);
+      alert('失敗');
+    }
+    setSaving(false);
+  }
+
+  return (
+    <div>
+      <h3 className="text-sm font-bold text-slate-700 mb-2">ライブ動画URL</h3>
+      <div className="flex gap-2">
+        <input type="url" value={url} onChange={e => setUrl(e.target.value)}
+          placeholder="https://youtube.com/..." className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+        <button onClick={handleSave} disabled={saving}
+          className="px-4 py-2 bg-slate-800 text-white rounded-lg font-bold text-sm disabled:opacity-50 shrink-0">
+          {saving ? '...' : '保存'}
+        </button>
+      </div>
     </div>
   );
 }
