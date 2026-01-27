@@ -17,7 +17,15 @@ import {
 
 const COLLECTIONS = {
   members: 'members',
-  notices: 'notices'
+  notices: 'notices',
+  bands: 'bands',
+  events: 'events',
+  entries: 'entries',
+  timetables: 'timetables',
+  setlists: 'setlists',
+  studioSchedules: 'studioSchedules',
+  bandRequests: 'bandRequests',
+  lotteries: 'lotteries',
 };
 
 export const API = {
@@ -79,6 +87,7 @@ export const API = {
         await setDoc(docRef, {
           ...memberData,
           pass,
+          roles: [],
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
@@ -189,5 +198,40 @@ export const API = {
       console.error("[API] deleteNotice error:", e);
       return { success: false, message: "エラーが発生しました" };
     }
-  }
+  },
+
+  /* ----- Roles (v1.0.0) ----- */
+
+  async updateMemberRoles(memberId, roles) {
+    try {
+      const docRef = doc(db, COLLECTIONS.members, memberId);
+      await updateDoc(docRef, {
+        roles,
+        updatedAt: serverTimestamp()
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateMemberRoles error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getAllMembers() {
+    try {
+      const snapshot = await getDocs(collection(db, COLLECTIONS.members));
+      return snapshot.docs.map(d => {
+        const data = d.data();
+        return {
+          id: d.id,
+          name: data.name || d.id,
+          part: data.part || "",
+          grade: data.grade || "",
+          roles: data.roles || [],
+        };
+      });
+    } catch (e) {
+      console.error("[API] getAllMembers error:", e);
+      throw e;
+    }
+  },
 };

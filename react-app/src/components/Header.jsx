@@ -4,11 +4,10 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function Header({ title = "ほーむずマッチング" }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isLoggedIn, auth, logout } = useAuth();
+  const { isLoggedIn, auth, logout, checkAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // TODO: Add admin role check
-  const isAdmin = isLoggedIn && auth.id === 'admin';
+  const isAdminUser = isLoggedIn && checkAdmin();
 
   const handleLogout = () => {
     logout();
@@ -71,7 +70,7 @@ export default function Header({ title = "ほーむずマッチング" }) {
             ホーム
           </Link>
 
-          {isAdmin && (
+          {isAdminUser && (
             <Link
               to="/admin"
               onClick={() => setMenuOpen(false)}

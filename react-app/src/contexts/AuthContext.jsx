@@ -1,4 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { hasPermission, isAdmin, isExecutive } from '../lib/constants';
+import { API } from '../lib/api';
 
 const AuthContext = createContext(null);
 
@@ -11,6 +13,11 @@ export function AuthProvider({ children }) {
     id: sessionStorage.getItem("auth_id") || "",
     pass: sessionStorage.getItem("auth_pass") || ""
   }));
+
+  const [roles, setRoles] = useState(() => {
+    const stored = sessionStorage.getItem("auth_roles");
+    return stored ? JSON.parse(stored) : [];
+  });
 
   const [isFirstLogin, setIsFirstLogin] = useState(() => {
     return sessionStorage.getItem("homes_first_login") === "1";
@@ -36,12 +43,14 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setIsLoggedIn(false);
     setAuthState({ id: "", pass: "" });
+    setRoles([]);
     setIsFirstLogin(false);
     sessionStorage.removeItem("homes_logged_in");
     sessionStorage.removeItem("auth_id");
     sessionStorage.removeItem("auth_pass");
     sessionStorage.removeItem("homes_login_id");
     sessionStorage.removeItem("homes_first_login");
+    sessionStorage.removeItem("auth_roles");
   };
 
   const clearFirstLogin = () => {
@@ -53,6 +62,25 @@ export function AuthProvider({ children }) {
     return !!auth.id && !!auth.pass;
   };
 
+  // ログイン時にFirestoreからrolesを取得
+  const fetchRoles = useCallback(async () => {
+    if (!auth.id) return;
+    try {
+      const member = await API.getMember(auth.id);
+      const memberRoles = member?.roles || [];
+      setRoles(memberRoles);
+      sessionStorage.setItem("auth_roles", JSON.stringify(memberRoles));
+    } catch (e) {
+      console.error("[AuthContext] fetchRoles error:", e);
+    }
+  }, [auth.id]);
+
+  useEffect(() => {
+    if (isLoggedIn && hasAuth()) {
+      fetchRoles();
+    }
+  }, [isLoggedIn, fetchRoles]);
+
   // Check auth consistency on mount
   useEffect(() => {
     if (isLoggedIn && !hasAuth()) {
@@ -60,15 +88,33 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // 権限チェックヘルパー
+  const checkPermission = useCallback((permission) => {
+    return hasPermission(roles, permission);
+  }, [roles]);
+
+  const checkAdmin = useCallback(() => {
+    return isAdmin(roles);
+  }, [roles]);
+
+  const checkExecutive = useCallback(() => {
+    return isExecutive(roles);
+  }, [roles]);
+
   return (
     <AuthContext.Provider value={{
       isLoggedIn,
       auth,
+      roles,
       isFirstLogin,
       login,
       logout,
       hasAuth,
-      clearFirstLogin
+      clearFirstLogin,
+      fetchRoles,
+      checkPermission,
+      checkAdmin,
+      checkExecutive,
     }}>
       {children}
     </AuthContext.Provider>
