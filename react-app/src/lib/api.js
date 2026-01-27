@@ -621,6 +621,51 @@ export const API = {
     }
   },
 
+  /* ----- Lotteries (v1.0.0) ----- */
+
+  async createLottery(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.lotteries), {
+        eventId: data.eventId,
+        results: data.results, // [{entryId, bandId, bandName, status: 'selected'|'rejected', exempt}]
+        status: 'pending_approval', // pending_approval | approved | rejected
+        createdBy: data.createdBy,
+        createdAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createLottery error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getLotteryByEvent(eventId) {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.lotteries),
+        where("eventId", "==", eventId)
+      );
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) return null;
+      const d = snapshot.docs[0];
+      return { id: d.id, ...d.data(), createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null };
+    } catch (e) {
+      console.error("[API] getLotteryByEvent error:", e);
+      throw e;
+    }
+  },
+
+  async updateLottery(id, fields) {
+    try {
+      const docRef = doc(db, COLLECTIONS.lotteries, id);
+      await updateDoc(docRef, fields);
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateLottery error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
   async getSetlistsByEvent(eventId) {
     try {
       const q = query(

@@ -222,10 +222,11 @@ function EventCreateModal({ onClose, onCreated }) {
 
 /* ========== イベント詳細モーダル ========== */
 function EventDetailModal({ event, onClose, onUpdated }) {
-  const { isLoggedIn, auth, checkPermission } = useAuth();
+  const { isLoggedIn, auth, checkPermission, checkExecutive } = useAuth();
   const canEdit = checkPermission('eventEdit');
   const canEditTimetable = checkPermission('timetableEdit');
   const canEditSetlist = checkPermission('setlistEdit');
+  const isExecutive = checkExecutive();
   const isLive = event.type === 'live';
   const [entries, setEntries] = useState([]);
   const [loadingEntries, setLoadingEntries] = useState(true);
@@ -234,8 +235,10 @@ function EventDetailModal({ event, onClose, onUpdated }) {
   const [setlists, setSetlists] = useState([]);
   const [showTimetableEdit, setShowTimetableEdit] = useState(false);
   const [showSetlistEdit, setShowSetlistEdit] = useState(false);
+  const [lottery, setLottery] = useState(null);
+  const [showLottery, setShowLottery] = useState(false);
 
-  useEffect(() => { fetchEntries(); fetchTimetableAndSetlists(); }, [event.id]);
+  useEffect(() => { fetchEntries(); fetchTimetableAndSetlists(); fetchLottery(); }, [event.id]);
 
   async function fetchTimetableAndSetlists() {
     if (!isLive) return;
@@ -248,6 +251,16 @@ function EventDetailModal({ event, onClose, onUpdated }) {
       setSetlists(sl);
     } catch (e) {
       console.error('[fetchTT/SL]', e);
+    }
+  }
+
+  async function fetchLottery() {
+    if (!isLive) return;
+    try {
+      const data = await API.getLotteryByEvent(event.id);
+      setLottery(data);
+    } catch (e) {
+      console.error('[fetchLottery]', e);
     }
   }
 
@@ -386,6 +399,39 @@ function EventDetailModal({ event, onClose, onUpdated }) {
               onClose={() => setShowEntryForm(false)}
               onCreated={() => { setShowEntryForm(false); fetchEntries(); }}
             />
+          )}
+
+          {/* Lottery (live only, authorized users) */}
+          {isLive && canEdit && (
+            <div className="border-t border-slate-200 pt-4 mt-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-bold text-slate-700">抽選</h3>
+                <button onClick={() => setShowLottery(!showLottery)}
+                  className="text-[10px] text-lime-600 font-bold">
+                  {showLottery ? '閉じる' : lottery ? '結果を見る' : '抽選を行う'}
+                </button>
+              </div>
+              {showLottery && (
+                <LotterySection
+                  eventId={event.id}
+                  entries={entries}
+                  lottery={lottery}
+                  isExecutive={isExecutive}
+                  creatorId={auth.id}
+                  onUpdated={() => { fetchLottery(); fetchEntries(); }}
+                />
+              )}
+              {lottery && !showLottery && (
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  lottery.status === 'approved' ? 'bg-lime-100 text-lime-700' :
+                  lottery.status === 'rejected' ? 'bg-rose-100 text-rose-500' :
+                  'bg-amber-100 text-amber-700'
+                }`}>
+                  {lottery.status === 'approved' ? '承認済' :
+                   lottery.status === 'rejected' ? '却下' : '承認待ち'}
+                </span>
+              )}
+            </div>
           )}
 
           {/* Timetable (live only) */}
@@ -793,6 +839,146 @@ function YouTubeUrlEditor({ event, onSaved }) {
           {saving ? '...' : '保存'}
         </button>
       </div>
+    </div>
+  );
+}
+
+/* ========== 抽選セクション ========== */
+function LotterySection({ eventId, entries, lottery, isExecutive, creatorId, onUpdated }) {
+  const bandEntries = entries.filter(e => e.type === 'band');
+  const [maxSlots, setMaxSlots] = useState(5);
+  const [running, setRunning] = useState(false);
+
+  async function runLottery() {
+    if (bandEntries.length === 0) {
+      alert('バンドエントリーがありません');
+      return;
+    }
+    setRunning(true);
+    try {
+      // 1バンドのみのメンバーは免除判定
+      const allBands = await API.getBands();
+      const memberBandCount = {};
+      allBands.forEach(band => {
+        (band.members || []).forEach(m => {
+          memberBandCount[m.id] = (memberBandCount[m.id] || 0) + 1;
+        });
+      });
+
+      const exempt = [];
+      const pool = [];
+
+      bandEntries.forEach(entry => {
+        const band = allBands.find(b => b.id === entry.bandId);
+        if (!band) { pool.push(entry); return; }
+        const allSingle = (band.members || []).every(m => (memberBandCount[m.id] || 0) <= 1);
+        if (allSingle) {
+          exempt.push({ entryId: entry.id, bandId: entry.bandId, bandName: entry.bandName, status: 'selected', exempt: true });
+        } else {
+          pool.push(entry);
+        }
+      });
+
+      // シャッフルして上限まで当選
+      const remaining = Math.max(0, maxSlots - exempt.length);
+      const shuffled = pool.sort(() => Math.random() - 0.5);
+      const results = [...exempt];
+      shuffled.forEach((entry, i) => {
+        results.push({
+          entryId: entry.id, bandId: entry.bandId, bandName: entry.bandName,
+          status: i < remaining ? 'selected' : 'rejected', exempt: false,
+        });
+      });
+
+      const result = await API.createLottery({ eventId, results, createdBy: creatorId });
+      if (result.success) {
+        alert('抽選を実行しました（幹部承認待ち）');
+        onUpdated();
+      } else {
+        alert(result.message || '失敗');
+      }
+    } catch (e) {
+      console.error('[runLottery]', e);
+      alert('失敗');
+    }
+    setRunning(false);
+  }
+
+  async function handleApprove() {
+    if (!lottery) return;
+    try {
+      // 承認: エントリーのstatusを更新
+      for (const r of lottery.results) {
+        await API.updateEntry(r.entryId, { status: r.status });
+      }
+      await API.updateLottery(lottery.id, { status: 'approved' });
+      alert('抽選結果を承認しました');
+      onUpdated();
+    } catch (e) {
+      console.error('[approveLottery]', e);
+      alert('失敗');
+    }
+  }
+
+  async function handleReject() {
+    if (!lottery) return;
+    try {
+      await API.updateLottery(lottery.id, { status: 'rejected' });
+      alert('抽選結果を却下しました');
+      onUpdated();
+    } catch (e) {
+      console.error('[rejectLottery]', e);
+      alert('失敗');
+    }
+  }
+
+  if (lottery) {
+    return (
+      <div>
+        <div className="space-y-1 mb-3">
+          {(lottery.results || []).map((r, i) => (
+            <div key={i} className="flex items-center justify-between bg-slate-50 rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-slate-800 font-bold">{r.bandName}</span>
+                {r.exempt && <span className="text-[10px] text-amber-600 font-bold">免除</span>}
+              </div>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                r.status === 'selected' ? 'bg-lime-100 text-lime-700' : 'bg-rose-100 text-rose-500'
+              }`}>
+                {r.status === 'selected' ? '当選' : '落選'}
+              </span>
+            </div>
+          ))}
+        </div>
+        {lottery.status === 'pending_approval' && isExecutive && (
+          <div className="flex gap-2">
+            <button onClick={handleApprove}
+              className="flex-1 py-2 bg-lime-500 text-white rounded-xl font-bold text-sm">承認</button>
+            <button onClick={handleReject}
+              className="flex-1 py-2 bg-slate-200 text-slate-600 rounded-xl font-bold text-sm">却下</button>
+          </div>
+        )}
+        {lottery.status === 'pending_approval' && !isExecutive && (
+          <p className="text-xs text-amber-600 text-center">幹部の承認待ちです</p>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3">
+        <label className="text-xs text-slate-600">出演枠数:</label>
+        <input type="number" min={1} value={maxSlots} onChange={e => setMaxSlots(Number(e.target.value))}
+          className="w-16 px-2 py-1 border border-slate-200 rounded text-sm" />
+      </div>
+      <p className="text-[10px] text-slate-500 mb-2">
+        全メンバーが1バンドのみのバンドは自動的に当選（免除）扱いになります
+      </p>
+      <button onClick={runLottery} disabled={running || bandEntries.length === 0}
+        className="w-full py-2 bg-slate-800 text-white rounded-xl font-bold text-sm disabled:opacity-50">
+        {running ? '抽選中...' : `抽選を実行 (${bandEntries.length}バンド)`}
+      </button>
     </div>
   );
 }
