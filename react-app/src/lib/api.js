@@ -496,4 +496,51 @@ export const API = {
       return { success: false, message: "エラーが発生しました" };
     }
   },
+
+  /* ----- Studio Schedules (v1.0.0) ----- */
+
+  async createStudioSchedule(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.studioSchedules), {
+        bandId: data.bandId,
+        bandName: data.bandName,
+        date: data.date,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        location: data.location,
+        locationOther: data.locationOther || "",
+        members: data.members || [],
+        createdBy: data.createdBy,
+        createdAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createStudioSchedule error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getStudioSchedules() {
+    try {
+      const snapshot = await getDocs(collection(db, COLLECTIONS.studioSchedules));
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null,
+      }));
+    } catch (e) {
+      console.error("[API] getStudioSchedules error:", e);
+      throw e;
+    }
+  },
+
+  async deleteStudioSchedule(id) {
+    try {
+      await deleteDoc(doc(db, COLLECTIONS.studioSchedules, id));
+      return { success: true };
+    } catch (e) {
+      console.error("[API] deleteStudioSchedule error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
 };
