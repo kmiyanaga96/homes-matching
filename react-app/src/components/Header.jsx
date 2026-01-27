@@ -11,7 +11,7 @@ export default function Header({ title = "ほーむずマッチング" }) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-40">
+      <header className="fixed top-0 left-0 right-0 bg-lime-200 border-b border-lime-300 z-40">
         <div className="flex items-center justify-between h-14 px-4 max-w-lg mx-auto">
           {/* Menu Button */}
           <button

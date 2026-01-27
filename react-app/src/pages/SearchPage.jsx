@@ -160,7 +160,7 @@ export default function SearchPage() {
             onChange={e => setFilterStatus(e.target.value)}
             className="flex-1 px-2 py-1.5 border border-slate-200 rounded-lg text-sm"
           >
-            <option value="">募集中ライブ</option>
+            <option value="">募集中</option>
             {visibleEvents.map(e => (
               <option key={e.name} value={e.name}>{e.name}</option>
             ))}
@@ -173,7 +173,7 @@ export default function SearchPage() {
             onChange={e => setSortMode(e.target.value)}
             className="flex-1 px-2 py-1.5 border border-slate-200 rounded-lg text-sm"
           >
-            <option value="updatedDesc">更新順</option>
+            <option value="updatedDesc">最終更新順</option>
             <option value="gradeAsc">学年↑</option>
             <option value="gradeDesc">学年↓</option>
           </select>
