@@ -357,4 +357,143 @@ export const API = {
       return { success: false, message: "エラーが発生しました" };
     }
   },
+
+  /* ----- Events (v1.0.0) ----- */
+
+  async createEvent(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.events), {
+        name: data.name,
+        type: data.type, // "live" | "other"
+        date: data.date,
+        location: data.location || "",
+        entryStart: data.entryStart || null,
+        entryEnd: data.entryEnd || null,
+        prepStart: data.prepStart || null,
+        prepEnd: data.prepEnd || null,
+        setDiagramStart: data.setDiagramStart || null,
+        setDiagramEnd: data.setDiagramEnd || null,
+        setDiagramFileUrl: data.setDiagramFileUrl || "",
+        youtubeUrl: data.youtubeUrl || "",
+        createdBy: data.createdBy,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createEvent error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getEvents() {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.events),
+        orderBy("date", "desc")
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null,
+        updatedAt: d.data().updatedAt?.toDate?.()?.toISOString() || null,
+      }));
+    } catch (e) {
+      console.error("[API] getEvents error:", e);
+      throw e;
+    }
+  },
+
+  async getEvent(id) {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.events, id));
+      if (!docSnap.exists()) return null;
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+        updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+      };
+    } catch (e) {
+      console.error("[API] getEvent error:", e);
+      throw e;
+    }
+  },
+
+  async updateEvent(id, fields) {
+    try {
+      const docRef = doc(db, COLLECTIONS.events, id);
+      await updateDoc(docRef, {
+        ...fields,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateEvent error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async deleteEvent(id) {
+    try {
+      await deleteDoc(doc(db, COLLECTIONS.events, id));
+      return { success: true };
+    } catch (e) {
+      console.error("[API] deleteEvent error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- Entries (v1.0.0) ----- */
+
+  async createEntry(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.entries), {
+        eventId: data.eventId,
+        type: data.type, // "band" | "individual"
+        bandId: data.bandId || null,
+        bandName: data.bandName || "",
+        memberId: data.memberId || null,
+        memberName: data.memberName || "",
+        songs: data.songs || [], // [{order, title, artist}]
+        status: "entered", // entered | selected | rejected
+        createdAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createEntry error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getEntriesByEvent(eventId) {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.entries),
+        where("eventId", "==", eventId)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null,
+      }));
+    } catch (e) {
+      console.error("[API] getEntriesByEvent error:", e);
+      throw e;
+    }
+  },
+
+  async updateEntry(id, fields) {
+    try {
+      const docRef = doc(db, COLLECTIONS.entries, id);
+      await updateDoc(docRef, fields);
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateEntry error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
 };
