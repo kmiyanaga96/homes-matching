@@ -1,13 +1,20 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Header({ title = "ほーむずマッチング" }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isLoggedIn, auth } = useAuth();
+  const { isLoggedIn, auth, logout } = useAuth();
+  const navigate = useNavigate();
 
   // TODO: Add admin role check
   const isAdmin = isLoggedIn && auth.id === 'admin';
+
+  const handleLogout = () => {
+    logout();
+    setMenuOpen(false);
+    navigate('/search');
+  };
 
   return (
     <>
@@ -16,7 +23,7 @@ export default function Header({ title = "ほーむずマッチング" }) {
           {/* Menu Button */}
           <button
             onClick={() => setMenuOpen(true)}
-            className="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+            className="p-2 -ml-2 text-slate-600 hover:bg-lime-300/50 rounded-lg"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -29,7 +36,7 @@ export default function Header({ title = "ほーむずマッチング" }) {
           {/* Refresh Button */}
           <button
             onClick={() => window.location.reload()}
-            className="p-2 -mr-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+            className="p-2 -mr-2 text-slate-600 hover:bg-lime-300/50 rounded-lg"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -47,11 +54,12 @@ export default function Header({ title = "ほーむずマッチング" }) {
       )}
 
       {/* Side Menu */}
-      <div className={`fixed top-0 left-0 h-full w-64 bg-white z-50 transform transition-transform duration-200 ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed top-0 left-0 h-full w-64 bg-white z-50 transform transition-transform duration-200 flex flex-col ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-4 border-b border-slate-200">
           <h2 className="font-bold text-slate-800">メニュー</h2>
         </div>
-        <nav className="p-2">
+
+        <nav className="p-2 flex-1">
           <Link
             to="/search"
             onClick={() => setMenuOpen(false)}
@@ -77,6 +85,21 @@ export default function Header({ title = "ほーむずマッチング" }) {
             </Link>
           )}
         </nav>
+
+        {/* Logout button at bottom */}
+        {isLoggedIn && (
+          <div className="p-2 border-t border-slate-200">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-rose-50 text-rose-500 w-full"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              ログアウト
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

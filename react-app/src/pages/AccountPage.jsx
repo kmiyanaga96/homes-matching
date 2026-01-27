@@ -5,7 +5,7 @@ import { API } from '../lib/api';
 import { getVisibleEvents, getEventColor, PARTS, GRADES } from '../lib/constants';
 
 export default function AccountPage() {
-  const { isLoggedIn, auth, logout, isFirstLogin, clearFirstLogin } = useAuth();
+  const { isLoggedIn, auth, isFirstLogin, clearFirstLogin } = useAuth();
   const navigate = useNavigate();
 
   const [member, setMember] = useState(null);
@@ -106,11 +106,6 @@ export default function AccountPage() {
     setSaving(false);
   }
 
-  const handleLogout = () => {
-    logout();
-    navigate('/search');
-  };
-
   if (!isLoggedIn) {
     return null;
   }
@@ -123,7 +118,7 @@ export default function AccountPage() {
 
   return (
     <div className="py-4">
-      <div className="bg-white rounded-2xl shadow p-4 mb-4">
+      <div className="bg-white rounded-2xl shadow p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-slate-800">マイページ</h2>
           <span className="text-xs text-slate-500">ID: {auth.id}</span>
@@ -219,14 +214,6 @@ export default function AccountPage() {
           {saving ? '保存中...' : '保存'}
         </button>
       </div>
-
-      {/* Logout */}
-      <button
-        onClick={handleLogout}
-        className="w-full py-3 bg-white text-rose-500 rounded-xl font-bold shadow"
-      >
-        ログアウト
-      </button>
     </div>
   );
 }
