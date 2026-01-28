@@ -15,8 +15,14 @@ export function AuthProvider({ children }) {
   }));
 
   const [roles, setRoles] = useState(() => {
-    const stored = localStorage.getItem("auth_roles");
-    return stored ? JSON.parse(stored) : [];
+    try {
+      const stored = localStorage.getItem("auth_roles");
+      if (!stored) return [];
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   });
 
   const [isFirstLogin, setIsFirstLogin] = useState(() => {
@@ -67,11 +73,12 @@ export function AuthProvider({ children }) {
     if (!auth.id) return;
     try {
       const member = await API.getMember(auth.id);
-      const memberRoles = member?.roles || [];
+      const memberRoles = Array.isArray(member?.roles) ? member.roles : [];
       setRoles(memberRoles);
       localStorage.setItem("auth_roles", JSON.stringify(memberRoles));
     } catch (e) {
       console.error("[AuthContext] fetchRoles error:", e);
+      setRoles([]);
     }
   }, [auth.id]);
 
