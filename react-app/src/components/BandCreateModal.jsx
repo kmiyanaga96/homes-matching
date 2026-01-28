@@ -7,6 +7,7 @@ export default function BandCreateModal({ onClose, onCreated }) {
   const { auth } = useAuth();
   const [name, setName] = useState('');
   const [myPart, setMyPart] = useState(PARTS[0]);
+  const [songs, setSongs] = useState('');
   const [equipment, setEquipment] = useState('');
   const [comment, setComment] = useState('');
   const [saving, setSaving] = useState(false);
@@ -15,6 +16,10 @@ export default function BandCreateModal({ onClose, onCreated }) {
     e.preventDefault();
     if (!name.trim()) {
       alert('バンド名を入力してください');
+      return;
+    }
+    if (!songs.trim()) {
+      alert('演奏曲を入力してください');
       return;
     }
     setSaving(true);
@@ -27,6 +32,7 @@ export default function BandCreateModal({ onClose, onCreated }) {
           name: member?.name || auth.id,
           part: myPart,
         }],
+        songs: songs.trim(),
         equipment: equipment.trim(),
         comment: comment.trim(),
         createdBy: auth.id,
@@ -82,6 +88,16 @@ export default function BandCreateModal({ onClose, onCreated }) {
                   <option key={p} value={p}>{p}</option>
                 ))}
               </select>
+            </label>
+
+            <label className="block mb-3">
+              <span className="text-sm font-bold text-slate-700">演奏曲 *</span>
+              <textarea
+                value={songs}
+                onChange={e => setSongs(e.target.value)}
+                className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm h-20 resize-none"
+                placeholder="例: 天体観測 / BUMP OF CHICKEN&#10;小さな恋のうた / MONGOL800"
+              />
             </label>
 
             <label className="block mb-3">

@@ -117,16 +117,34 @@ export default function BandDetailModal({ band, onClose, onUpdated }) {
           {/* Members */}
           <div className="mb-4">
             <h3 className="text-sm font-bold text-slate-700 mb-2">メンバー</h3>
-            <div className="space-y-1">
-              {(band.members || []).map((m, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm">
-                  <span className="text-[10px] px-2 py-0.5 bg-lime-100 text-lime-700 rounded-full">{m.part}</span>
-                  <span className="text-slate-800">{m.name || m.id}</span>
-                  <span className="text-[10px] text-slate-400">@{m.id}</span>
-                </div>
-              ))}
+            <div className="space-y-2">
+              {(band.members || []).map((m, i) => {
+                const avatarUrl = `https://unavatar.io/twitter/${m.id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(m.name || '')}`;
+                return (
+                  <div key={i} className="flex items-center gap-2">
+                    <img
+                      src={avatarUrl}
+                      alt={m.name}
+                      className="w-8 h-8 rounded-full object-cover bg-slate-200"
+                      onError={(e) => {
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name || '')}`;
+                      }}
+                    />
+                    <span className="text-sm text-slate-800 font-medium">{m.name || m.id}</span>
+                    <span className="text-[10px] px-2 py-0.5 bg-lime-100 text-lime-700 rounded-full">{m.part}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
+
+          {/* Songs */}
+          {band.songs && (
+            <div className="mb-4">
+              <h3 className="text-sm font-bold text-slate-700 mb-1">演奏曲</h3>
+              <p className="text-xs text-slate-600 whitespace-pre-wrap">{band.songs}</p>
+            </div>
+          )}
 
           {/* Equipment */}
           {band.equipment && (

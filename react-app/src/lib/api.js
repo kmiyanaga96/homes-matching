@@ -242,6 +242,7 @@ export const API = {
       const docRef = await addDoc(collection(db, COLLECTIONS.bands), {
         name: data.name,
         members: data.members, // [{id, name, part}]
+        songs: data.songs || "",
         equipment: data.equipment || "",
         comment: data.comment || "",
         status: "recruiting", // recruiting | closed
