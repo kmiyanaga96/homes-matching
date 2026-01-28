@@ -247,7 +247,6 @@ function BandSearchTab() {
   const [loading, setLoading] = useState(true);
   const [searchName, setSearchName] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
-  const [sortMode, setSortMode] = useState('updatedDesc');
   const [selectedBand, setSelectedBand] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
 
@@ -267,27 +266,13 @@ function BandSearchTab() {
   const filteredBands = useMemo(() => {
     const nameVal = searchName.toLowerCase();
 
-    let filtered = bands.filter(b => {
+    return bands.filter(b => {
       const matchName = b.name.toLowerCase().includes(nameVal) ||
         (b.members || []).some(m => (m.name || '').toLowerCase().includes(nameVal));
       const matchStatus = filterStatus === '' || b.status === filterStatus;
       return matchName && matchStatus;
     });
-
-    if (sortMode === 'updatedDesc') {
-      filtered.sort((a, b) => {
-        const ta = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-        const tb = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-        return tb - ta;
-      });
-    } else if (sortMode === 'nameAsc') {
-      filtered.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
-    } else if (sortMode === 'membersDesc') {
-      filtered.sort((a, b) => (b.members || []).length - (a.members || []).length);
-    }
-
-    return filtered;
-  }, [bands, searchName, filterStatus, sortMode]);
+  }, [bands, searchName, filterStatus]);
 
   async function handleBandUpdated() {
     await fetchBands();
@@ -319,16 +304,6 @@ function BandSearchTab() {
             <option value="">すべて</option>
             <option value="recruiting">募集中</option>
             <option value="closed">〆</option>
-          </select>
-
-          <select
-            value={sortMode}
-            onChange={e => setSortMode(e.target.value)}
-            className="flex-1 px-2 py-1.5 border border-slate-200 rounded-lg text-sm"
-          >
-            <option value="updatedDesc">最終更新順</option>
-            <option value="nameAsc">名前順</option>
-            <option value="membersDesc">人数順</option>
           </select>
         </div>
 
