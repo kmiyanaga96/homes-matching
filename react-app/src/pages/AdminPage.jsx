@@ -252,7 +252,7 @@ function MembersSection() {
                 {m.grade && <span className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">{m.grade}年</span>}
               </div>
             </div>
-            {m.roles && m.roles.length > 0 && (
+            {Array.isArray(m.roles) && m.roles.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {m.roles.map(role => (
                   <span key={role} className="text-[10px] px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
