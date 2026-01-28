@@ -39,7 +39,7 @@ export const EVENT_COLORS = {
   }
 };
 
-export const PARTS = ["Vo", "Gt", "Key", "Ba", "Dr"];
+export const PARTS = ["Vo", "Gt", "Key", "Ba", "Dr", "その他"];
 
 export const GRADES = ["1", "2", "3", "4", "OB/OG"];
 
