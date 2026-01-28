@@ -86,7 +86,7 @@ export const ROLE_PERMISSIONS = {
 
 // ユーザーの役職配列から権限を判定
 export function hasPermission(roles, permission) {
-  if (!roles || roles.length === 0) return false;
+  if (!Array.isArray(roles) || roles.length === 0) return false;
   return roles.some(role => {
     const perms = ROLE_PERMISSIONS[role];
     return perms && perms.includes(permission);
@@ -95,12 +95,12 @@ export function hasPermission(roles, permission) {
 
 // 管理画面アクセス可能か（管理者のみ）
 export function isAdmin(roles) {
-  return roles && roles.includes("admin");
+  return Array.isArray(roles) && roles.includes("admin");
 }
 
 // 幹部権限か（代表・副代表・事務・会計・管理者）
 export function isExecutive(roles) {
-  if (!roles) return false;
+  if (!Array.isArray(roles)) return false;
   const executiveRoles = ["admin", "president", "vicePresident", "secretary", "treasurer"];
   return roles.some(r => executiveRoles.includes(r));
 }
