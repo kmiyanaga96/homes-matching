@@ -71,9 +71,12 @@ export function AuthProvider({ children }) {
   // ログイン時にFirestoreからrolesを取得
   const fetchRoles = useCallback(async () => {
     if (!auth.id) return;
+    console.log("[AuthContext] fetchRoles called for:", auth.id);
     try {
       const member = await API.getMember(auth.id);
+      console.log("[AuthContext] member data:", member);
       const memberRoles = Array.isArray(member?.roles) ? member.roles : [];
+      console.log("[AuthContext] setting roles:", memberRoles);
       setRoles(memberRoles);
       localStorage.setItem("auth_roles", JSON.stringify(memberRoles));
     } catch (e) {
