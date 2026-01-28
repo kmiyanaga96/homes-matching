@@ -345,12 +345,12 @@ function RolesSection() {
                     <span className="text-xs text-slate-500 ml-2">@{m.id}</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
-                    {(m.roles || []).map(role => (
+                    {Array.isArray(m.roles) && m.roles.map(role => (
                       <span key={role} className="text-[10px] px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
                         {ROLES[role] || role}
                       </span>
                     ))}
-                    {(!m.roles || m.roles.length === 0) && (
+                    {(!Array.isArray(m.roles) || m.roles.length === 0) && (
                       <span className="text-[10px] text-slate-400">役職なし</span>
                     )}
                   </div>
