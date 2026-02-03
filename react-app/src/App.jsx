@@ -9,6 +9,7 @@ import SchedulePage from './pages/SchedulePage';
 import NoticesPage from './pages/NoticesPage';
 import AccountPage from './pages/AccountPage';
 import AdminPage from './pages/AdminPage';
+import NotificationsPage from './pages/NotificationsPage';
 import LoginModal from './components/LoginModal';
 import './index.css';
 
@@ -37,6 +38,7 @@ function AppContent() {
           <Route path="schedule" element={<SchedulePage />} />
           <Route path="notices" element={<NoticesPage />} />
           <Route path="account" element={<AccountPage />} />
+          <Route path="notifications" element={<NotificationsPage />} />
           <Route path="admin" element={<AdminPage />} />
         </Route>
       </Routes>

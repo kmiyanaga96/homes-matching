@@ -26,6 +26,7 @@ const COLLECTIONS = {
   studioSchedules: 'studioSchedules',
   bandRequests: 'bandRequests',
   lotteries: 'lotteries',
+  notificationSettings: 'notificationSettings',
 };
 
 export const API = {
@@ -681,6 +682,33 @@ export const API = {
     } catch (e) {
       console.error("[API] getSetlistsByEvent error:", e);
       throw e;
+    }
+  },
+
+  /* ----- Notification Settings (v1.0.0) ----- */
+
+  async getNotificationSettings(memberId) {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.notificationSettings, memberId));
+      if (!docSnap.exists()) return null;
+      return docSnap.data();
+    } catch (e) {
+      console.error("[API] getNotificationSettings error:", e);
+      throw e;
+    }
+  },
+
+  async saveNotificationSettings(memberId, settings) {
+    try {
+      const docRef = doc(db, COLLECTIONS.notificationSettings, memberId);
+      await setDoc(docRef, {
+        ...settings,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] saveNotificationSettings error:", e);
+      return { success: false, message: "エラーが発生しました" };
     }
   },
 };
