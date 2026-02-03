@@ -5,6 +5,14 @@ import { STUDIO_LOCATIONS } from '../lib/constants';
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 
+// 30分単位の時刻オプション（00:00〜23:30）
+const TIME_OPTIONS = [];
+for (let h = 0; h < 24; h++) {
+  for (let m = 0; m < 60; m += 30) {
+    TIME_OPTIONS.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+  }
+}
+
 export default function SchedulePage() {
   const { isLoggedIn, auth } = useAuth();
   const [currentDate, setCurrentDate] = useState(() => {
@@ -355,13 +363,19 @@ function StudioCreateModal({ onClose, onCreated }) {
             <div className="flex gap-2 mb-3">
               <label className="flex-1">
                 <span className="text-sm font-bold text-slate-700">開始時刻 *</span>
-                <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                <select value={startTime} onChange={e => setStartTime(e.target.value)}
+                  className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                  <option value="">選択</option>
+                  {TIME_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
               </label>
               <label className="flex-1">
                 <span className="text-sm font-bold text-slate-700">終了時刻 *</span>
-                <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                <select value={endTime} onChange={e => setEndTime(e.target.value)}
+                  className="w-full mt-1 px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                  <option value="">選択</option>
+                  {TIME_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
               </label>
             </div>
 
