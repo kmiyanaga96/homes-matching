@@ -39,9 +39,94 @@ export const EVENT_COLORS = {
   }
 };
 
-export const PARTS = ["Vo", "Gt", "Key", "Ba", "Dr"];
+export const PARTS = ["Vo", "Gt", "Key", "Ba", "Dr", "その他"];
 
 export const GRADES = ["1", "2", "3", "4", "OB/OG"];
+
+// --- v1.0.0: 役職・権限・スタジオ定義 ---
+
+export const ROLES = {
+  admin: "管理者",
+  president: "代表",
+  vicePresident: "副代表",
+  secretary: "事務",
+  treasurer: "会計",
+  groupLeader: "班長",
+  partLeader: "パートリーダー",
+};
+
+export const ROLE_KEYS = Object.keys(ROLES);
+
+// 班の種類（班長用）
+export const GROUPS = ["撮影班", "PA班", "照明班"];
+
+// 権限定義
+export const PERMISSIONS = {
+  eventEdit: "イベント作成編集",
+  noticeEdit: "お知らせ作成編集",
+  studioEdit: "スタジオ表作成編集",
+  timetableEdit: "タイムテーブル作成編集",
+  setlistEdit: "セットリスト作成編集",
+  archiveUpload: "アーカイブアップロード",
+};
+
+// 役職ごとの権限マッピング
+const ALL_PERMISSIONS = Object.keys(PERMISSIONS);
+const LIMITED_PERMISSIONS = ["eventEdit", "noticeEdit"];
+
+export const ROLE_PERMISSIONS = {
+  admin: ALL_PERMISSIONS,
+  president: ALL_PERMISSIONS,
+  vicePresident: ALL_PERMISSIONS,
+  secretary: ALL_PERMISSIONS,
+  treasurer: ALL_PERMISSIONS,
+  groupLeader: LIMITED_PERMISSIONS,
+  partLeader: LIMITED_PERMISSIONS,
+};
+
+// ユーザーの役職配列から権限を判定
+export function hasPermission(roles, permission) {
+  if (!Array.isArray(roles) || roles.length === 0) return false;
+  return roles.some(role => {
+    const perms = ROLE_PERMISSIONS[role];
+    return perms && perms.includes(permission);
+  });
+}
+
+// 管理画面アクセス可能か（管理者のみ）
+export function isAdmin(roles) {
+  return Array.isArray(roles) && roles.includes("admin");
+}
+
+// 幹部権限か（代表・副代表・事務・会計・管理者）
+export function isExecutive(roles) {
+  if (!Array.isArray(roles)) return false;
+  const executiveRoles = ["admin", "president", "vicePresident", "secretary", "treasurer"];
+  return roles.some(r => executiveRoles.includes(r));
+}
+
+// スタジオ練習場所
+export const STUDIO_LOCATIONS = [
+  "NOAH新宿",
+  "NOAH高田馬場",
+  "NOAH渋谷1号",
+  "NOAH渋谷2号",
+  "NOAH渋谷本店",
+  "NOAH池袋",
+  "NOAH秋葉原",
+];
+
+// バンドステータス
+export const BAND_STATUS = {
+  recruiting: "募集中",
+  closed: "〆",
+};
+
+// イベントタイプ（v1.0.0）
+export const EVENT_TYPES = {
+  live: "ライブ",
+  other: "その他",
+};
 
 // Get visible events based on current month (6 month window)
 export function getVisibleEvents() {

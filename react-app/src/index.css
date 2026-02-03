@@ -5,3 +5,18 @@ body {
   min-height: 100vh;
   background-color: #f8fafc;
 }
+
+/* Focus ring with lime accent */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  ring: 2px;
+  --tw-ring-color: #bef264;
+  box-shadow: 0 0 0 2px #bef264;
+}
+
+/* Safe area for bottom nav on iOS */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}

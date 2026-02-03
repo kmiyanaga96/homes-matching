@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { API } from '../lib/api';
 
 export default function LoginModal({ isOpen, onClose }) {
-  const [id, setId] = useState('');
+  const [id, setId] = useState('@');
   const [pass, setPass] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -15,7 +15,8 @@ export default function LoginModal({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const trimmedId = id.trim();
+    // @を除去してIDを取得
+    const trimmedId = id.replace(/^@/, '').trim();
     const trimmedPass = pass.trim();
 
     if (!trimmedId || !/^\d{4}$/.test(trimmedPass)) {
@@ -72,9 +73,17 @@ export default function LoginModal({ isOpen, onClose }) {
             <input
               type="text"
               value={id}
-              onChange={e => setId(e.target.value)}
+              onChange={e => {
+                const val = e.target.value;
+                // @が消されないようにする
+                if (!val.startsWith('@')) {
+                  setId('@' + val.replace(/@/g, ''));
+                } else {
+                  setId(val);
+                }
+              }}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
-              placeholder="@なしで入力"
+              placeholder="@username"
               autoComplete="username"
             />
           </div>

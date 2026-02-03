@@ -1,9 +1,6 @@
-import { useState } from 'react';
 import { getEventColor } from '../lib/constants';
 
 export default function MemberCard({ member, isFavorite, onToggleFavorite, visibleEvents }) {
-  const [expanded, setExpanded] = useState(false);
-
   const isOBOG = member.grade === 'OB/OG';
   const gradeDisplay = isOBOG ? 'OB/OG' : `${member.grade}年`;
   const parts = (member.part || '').split('/').filter(Boolean);
@@ -15,16 +12,9 @@ export default function MemberCard({ member, isFavorite, onToggleFavorite, visib
   const avatarUrl = `https://unavatar.io/twitter/${member.id}?fallback=https://ui-avatars.com/api/?name=${encodeURIComponent(member.name || '')}`;
 
   return (
-    <div
-      className={`bg-white rounded-2xl shadow overflow-hidden transition-all ${
-        expanded ? 'ring-2 ring-slate-300' : ''
-      }`}
-    >
-      {/* Header - Always visible */}
-      <div
-        className="flex items-center gap-3 p-3 cursor-pointer"
-        onClick={() => setExpanded(prev => !prev)}
-      >
+    <div className="bg-white rounded-2xl shadow overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-3 p-3">
         <img
           src={avatarUrl}
           alt={member.name}
@@ -52,19 +42,29 @@ export default function MemberCard({ member, isFavorite, onToggleFavorite, visib
           </div>
         </div>
 
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleFavorite();
-          }}
-          className={`text-xl ${isFavorite ? 'text-rose-500' : 'text-slate-300'}`}
-        >
-          ★
-        </button>
+        {/* Twitter link & Favorite */}
+        <div className="flex items-center gap-1">
+          <a
+            href={`https://twitter.com/${member.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 text-slate-400 hover:text-blue-500 transition"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
+          <button
+            onClick={onToggleFavorite}
+            className={`text-2xl transition ${isFavorite ? 'text-rose-500' : 'text-slate-300'}`}
+          >
+            ♡
+          </button>
+        </div>
       </div>
 
-      {/* Status chips - Always visible */}
-      <div className="flex flex-wrap gap-1 px-3 pb-3">
+      {/* Status chips */}
+      <div className="flex flex-wrap gap-1 px-3 pb-2">
         {visibleStatuses.map(status => {
           const color = getEventColor(status);
           return (
@@ -78,27 +78,12 @@ export default function MemberCard({ member, isFavorite, onToggleFavorite, visib
         })}
       </div>
 
-      {/* Expanded content */}
-      {expanded && (
-        <div className="px-3 pb-3 pt-1 border-t border-slate-100">
-          <p className="text-sm text-slate-600 whitespace-pre-wrap">
-            {member.comment || 'イエッタイガー！'}
-          </p>
-
-          <a
-            href={`https://twitter.com/${member.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 mt-2 text-xs text-blue-500 hover:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-            </svg>
-            @{member.id}
-          </a>
-        </div>
-      )}
+      {/* Comment */}
+      <div className="px-3 pb-3">
+        <p className="text-[13px] text-slate-500">
+          {member.comment || 'イエッタイガー！'}
+        </p>
+      </div>
     </div>
   );
 }

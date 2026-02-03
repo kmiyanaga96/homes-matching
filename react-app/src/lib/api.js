@@ -17,7 +17,16 @@ import {
 
 const COLLECTIONS = {
   members: 'members',
-  notices: 'notices'
+  notices: 'notices',
+  bands: 'bands',
+  events: 'events',
+  entries: 'entries',
+  timetables: 'timetables',
+  setlists: 'setlists',
+  studioSchedules: 'studioSchedules',
+  bandRequests: 'bandRequests',
+  lotteries: 'lotteries',
+  notificationSettings: 'notificationSettings',
 };
 
 export const API = {
@@ -79,6 +88,7 @@ export const API = {
         await setDoc(docRef, {
           ...memberData,
           pass,
+          roles: [],
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
@@ -189,5 +199,516 @@ export const API = {
       console.error("[API] deleteNotice error:", e);
       return { success: false, message: "エラーが発生しました" };
     }
-  }
+  },
+
+  /* ----- Roles (v1.0.0) ----- */
+
+  async updateMemberRoles(memberId, roles) {
+    try {
+      const docRef = doc(db, COLLECTIONS.members, memberId);
+      await updateDoc(docRef, {
+        roles,
+        updatedAt: serverTimestamp()
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateMemberRoles error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getAllMembers() {
+    try {
+      const snapshot = await getDocs(collection(db, COLLECTIONS.members));
+      return snapshot.docs.map(d => {
+        const data = d.data();
+        return {
+          id: d.id,
+          name: data.name || d.id,
+          part: data.part || "",
+          grade: data.grade || "",
+          roles: data.roles || [],
+        };
+      });
+    } catch (e) {
+      console.error("[API] getAllMembers error:", e);
+      throw e;
+    }
+  },
+
+  /* ----- Bands (v1.0.0) ----- */
+
+  async createBand(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.bands), {
+        name: data.name,
+        members: data.members, // [{id, name, part}]
+        songs: data.songs || "",
+        equipment: data.equipment || "",
+        comment: data.comment || "",
+        status: "recruiting", // recruiting | closed
+        createdBy: data.createdBy,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createBand error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getBands() {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.bands),
+        orderBy("updatedAt", "desc")
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => {
+        const data = d.data();
+        return {
+          id: d.id,
+          ...data,
+          createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+          updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+        };
+      });
+    } catch (e) {
+      console.error("[API] getBands error:", e);
+      throw e;
+    }
+  },
+
+  async getBand(id) {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.bands, id));
+      if (!docSnap.exists()) return null;
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+        updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+      };
+    } catch (e) {
+      console.error("[API] getBand error:", e);
+      throw e;
+    }
+  },
+
+  async updateBand(id, fields) {
+    try {
+      const docRef = doc(db, COLLECTIONS.bands, id);
+      await updateDoc(docRef, {
+        ...fields,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateBand error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- Band Requests (v1.0.0) ----- */
+
+  async createBandRequest(bandId, applicantId, applicantName, applicantPart) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.bandRequests), {
+        bandId,
+        applicantId,
+        applicantName,
+        applicantPart,
+        status: "pending", // pending | approved | rejected
+        createdAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createBandRequest error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getBandRequests(bandId) {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.bandRequests),
+        where("bandId", "==", bandId),
+        where("status", "==", "pending")
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null,
+      }));
+    } catch (e) {
+      console.error("[API] getBandRequests error:", e);
+      throw e;
+    }
+  },
+
+  async updateBandRequest(requestId, status) {
+    try {
+      const docRef = doc(db, COLLECTIONS.bandRequests, requestId);
+      await updateDoc(docRef, { status });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateBandRequest error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- Events (v1.0.0) ----- */
+
+  async createEvent(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.events), {
+        name: data.name,
+        type: data.type, // "live" | "other"
+        date: data.date,
+        location: data.location || "",
+        entryStart: data.entryStart || null,
+        entryEnd: data.entryEnd || null,
+        prepStart: data.prepStart || null,
+        prepEnd: data.prepEnd || null,
+        setDiagramStart: data.setDiagramStart || null,
+        setDiagramEnd: data.setDiagramEnd || null,
+        setDiagramFileUrl: data.setDiagramFileUrl || "",
+        youtubeUrl: data.youtubeUrl || "",
+        createdBy: data.createdBy,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createEvent error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getEvents() {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.events),
+        orderBy("date", "desc")
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null,
+        updatedAt: d.data().updatedAt?.toDate?.()?.toISOString() || null,
+      }));
+    } catch (e) {
+      console.error("[API] getEvents error:", e);
+      throw e;
+    }
+  },
+
+  async getEvent(id) {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.events, id));
+      if (!docSnap.exists()) return null;
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        ...data,
+        createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+        updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+      };
+    } catch (e) {
+      console.error("[API] getEvent error:", e);
+      throw e;
+    }
+  },
+
+  async updateEvent(id, fields) {
+    try {
+      const docRef = doc(db, COLLECTIONS.events, id);
+      await updateDoc(docRef, {
+        ...fields,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateEvent error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async deleteEvent(id) {
+    try {
+      await deleteDoc(doc(db, COLLECTIONS.events, id));
+      return { success: true };
+    } catch (e) {
+      console.error("[API] deleteEvent error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- Entries (v1.0.0) ----- */
+
+  async createEntry(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.entries), {
+        eventId: data.eventId,
+        type: data.type, // "band" | "individual"
+        bandId: data.bandId || null,
+        bandName: data.bandName || "",
+        memberId: data.memberId || null,
+        memberName: data.memberName || "",
+        songs: data.songs || [], // [{order, title, artist}]
+        status: "entered", // entered | selected | rejected
+        createdAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createEntry error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getEntriesByEvent(eventId) {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.entries),
+        where("eventId", "==", eventId)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null,
+      }));
+    } catch (e) {
+      console.error("[API] getEntriesByEvent error:", e);
+      throw e;
+    }
+  },
+
+  async updateEntry(id, fields) {
+    try {
+      const docRef = doc(db, COLLECTIONS.entries, id);
+      await updateDoc(docRef, fields);
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateEntry error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- Studio Schedules (v1.0.0) ----- */
+
+  async createStudioSchedule(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.studioSchedules), {
+        bandId: data.bandId,
+        bandName: data.bandName,
+        date: data.date,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        location: data.location,
+        locationOther: data.locationOther || "",
+        members: data.members || [],
+        createdBy: data.createdBy,
+        createdAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createStudioSchedule error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getStudioSchedules() {
+    try {
+      const snapshot = await getDocs(collection(db, COLLECTIONS.studioSchedules));
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+        createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null,
+      }));
+    } catch (e) {
+      console.error("[API] getStudioSchedules error:", e);
+      throw e;
+    }
+  },
+
+  async deleteStudioSchedule(id) {
+    try {
+      await deleteDoc(doc(db, COLLECTIONS.studioSchedules, id));
+      return { success: true };
+    } catch (e) {
+      console.error("[API] deleteStudioSchedule error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- Timetables (v1.0.0) ----- */
+
+  async saveTimetable(eventId, slots) {
+    try {
+      const docRef = doc(db, COLLECTIONS.timetables, eventId);
+      await setDoc(docRef, {
+        eventId,
+        slots, // [{startTime, endTime, bandName}]
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] saveTimetable error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getTimetable(eventId) {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.timetables, eventId));
+      if (!docSnap.exists()) return null;
+      return docSnap.data();
+    } catch (e) {
+      console.error("[API] getTimetable error:", e);
+      throw e;
+    }
+  },
+
+  /* ----- Setlists (v1.0.0) ----- */
+
+  async saveSetlist(eventId, bandId, songs) {
+    try {
+      const docId = `${eventId}_${bandId}`;
+      const docRef = doc(db, COLLECTIONS.setlists, docId);
+      await setDoc(docRef, {
+        eventId,
+        bandId,
+        songs, // [{order, title, artist}]
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] saveSetlist error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- FCM Tokens (v1.0.0) ----- */
+
+  async saveFCMToken(memberId, token) {
+    try {
+      const docRef = doc(db, COLLECTIONS.members, memberId);
+      await updateDoc(docRef, {
+        fcmToken: token,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] saveFCMToken error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async removeFCMToken(memberId) {
+    try {
+      const docRef = doc(db, COLLECTIONS.members, memberId);
+      await updateDoc(docRef, {
+        fcmToken: "",
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] removeFCMToken error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- Lotteries (v1.0.0) ----- */
+
+  async createLottery(data) {
+    try {
+      const docRef = await addDoc(collection(db, COLLECTIONS.lotteries), {
+        eventId: data.eventId,
+        results: data.results, // [{entryId, bandId, bandName, status: 'selected'|'rejected', exempt}]
+        status: 'pending_approval', // pending_approval | approved | rejected
+        createdBy: data.createdBy,
+        createdAt: serverTimestamp(),
+      });
+      return { success: true, id: docRef.id };
+    } catch (e) {
+      console.error("[API] createLottery error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getLotteryByEvent(eventId) {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.lotteries),
+        where("eventId", "==", eventId)
+      );
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) return null;
+      const d = snapshot.docs[0];
+      return { id: d.id, ...d.data(), createdAt: d.data().createdAt?.toDate?.()?.toISOString() || null };
+    } catch (e) {
+      console.error("[API] getLotteryByEvent error:", e);
+      throw e;
+    }
+  },
+
+  async updateLottery(id, fields) {
+    try {
+      const docRef = doc(db, COLLECTIONS.lotteries, id);
+      await updateDoc(docRef, fields);
+      return { success: true };
+    } catch (e) {
+      console.error("[API] updateLottery error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  async getSetlistsByEvent(eventId) {
+    try {
+      const q = query(
+        collection(db, COLLECTIONS.setlists),
+        where("eventId", "==", eventId)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+      }));
+    } catch (e) {
+      console.error("[API] getSetlistsByEvent error:", e);
+      throw e;
+    }
+  },
+
+  /* ----- Notification Settings (v1.0.0) ----- */
+
+  async getNotificationSettings(memberId) {
+    try {
+      const docSnap = await getDoc(doc(db, COLLECTIONS.notificationSettings, memberId));
+      if (!docSnap.exists()) return null;
+      return docSnap.data();
+    } catch (e) {
+      console.error("[API] getNotificationSettings error:", e);
+      throw e;
+    }
+  },
+
+  async saveNotificationSettings(memberId, settings) {
+    try {
+      const docRef = doc(db, COLLECTIONS.notificationSettings, memberId);
+      await setDoc(docRef, {
+        ...settings,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] saveNotificationSettings error:", e);
+      return { success: false, message: "エラーが発生しました" };
+    }
+  },
 };
