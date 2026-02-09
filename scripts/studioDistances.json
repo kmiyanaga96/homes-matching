@@ -1,0 +1,26 @@
+{
+  "comment": "スタジオ間の移動時間（分）。すべてのスタジオペアで1時間（60分）",
+  "distances": [
+    { "from": "noah_shinjuku", "to": "noah_takadanobaba", "minutes": 60 },
+    { "from": "noah_shinjuku", "to": "noah_ikebukuro", "minutes": 60 },
+    { "from": "noah_shinjuku", "to": "noah_shibuya_honten", "minutes": 60 },
+    { "from": "noah_shinjuku", "to": "noah_shibuya_1gou", "minutes": 60 },
+    { "from": "noah_shinjuku", "to": "noah_shibuya_2gou", "minutes": 60 },
+    { "from": "noah_shinjuku", "to": "noah_akihabara", "minutes": 60 },
+    { "from": "noah_takadanobaba", "to": "noah_ikebukuro", "minutes": 60 },
+    { "from": "noah_takadanobaba", "to": "noah_shibuya_honten", "minutes": 60 },
+    { "from": "noah_takadanobaba", "to": "noah_shibuya_1gou", "minutes": 60 },
+    { "from": "noah_takadanobaba", "to": "noah_shibuya_2gou", "minutes": 60 },
+    { "from": "noah_takadanobaba", "to": "noah_akihabara", "minutes": 60 },
+    { "from": "noah_ikebukuro", "to": "noah_shibuya_honten", "minutes": 60 },
+    { "from": "noah_ikebukuro", "to": "noah_shibuya_1gou", "minutes": 60 },
+    { "from": "noah_ikebukuro", "to": "noah_shibuya_2gou", "minutes": 60 },
+    { "from": "noah_ikebukuro", "to": "noah_akihabara", "minutes": 60 },
+    { "from": "noah_shibuya_honten", "to": "noah_shibuya_1gou", "minutes": 60 },
+    { "from": "noah_shibuya_honten", "to": "noah_shibuya_2gou", "minutes": 60 },
+    { "from": "noah_shibuya_honten", "to": "noah_akihabara", "minutes": 60 },
+    { "from": "noah_shibuya_1gou", "to": "noah_shibuya_2gou", "minutes": 60 },
+    { "from": "noah_shibuya_1gou", "to": "noah_akihabara", "minutes": 60 },
+    { "from": "noah_shibuya_2gou", "to": "noah_akihabara", "minutes": 60 }
+  ]
+}

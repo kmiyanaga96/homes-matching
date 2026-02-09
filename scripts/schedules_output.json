@@ -1,0 +1,54 @@
+{
+  "schedules": [
+    {
+      "bandId": "bandB",
+      "bandName": "Band B",
+      "day": "2026-08-12",
+      "startTime": "18:00",
+      "endTime": "21:00",
+      "studioId": "noah_shibuya_honten_s",
+      "studioName": "NOAH渋谷本店 S",
+      "hours": 3,
+      "members": [
+        "u4",
+        "u2"
+      ]
+    },
+    {
+      "bandId": "bandC",
+      "bandName": "Band C",
+      "day": "2026-08-12",
+      "startTime": "18:00",
+      "endTime": "20:00",
+      "studioId": "noah_shinjuku_s2",
+      "studioName": "NOAH新宿 S2",
+      "hours": 2,
+      "members": [
+        "u5",
+        "u6",
+        "u1"
+      ]
+    },
+    {
+      "bandId": "bandA",
+      "bandName": "Band A",
+      "day": "2026-08-10",
+      "startTime": "19:00",
+      "endTime": "20:00",
+      "studioId": "noah_shibuya_honten_s",
+      "studioName": "NOAH渋谷本店 S",
+      "hours": 1,
+      "members": [
+        "u1",
+        "u2",
+        "u3"
+      ]
+    }
+  ],
+  "unscheduled": [
+    {
+      "bandId": "bandA",
+      "remaining": 3
+    }
+  ]
+}

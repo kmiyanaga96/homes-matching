@@ -1,0 +1,139 @@
+{
+  "studios": [
+    {
+      "id": "noah_shinjuku",
+      "name": "NOAH新宿",
+      "location": "新宿",
+      "rooms": [
+        { "id": "s1", "name": "S1", "tatami": 7, "estimatedCapacity": 3 },
+        { "id": "s2", "name": "S2", "tatami": 6.5, "estimatedCapacity": 2 },
+        { "id": "s3", "name": "S3", "tatami": 6.5, "estimatedCapacity": 2 },
+        { "id": "a1", "name": "A1", "tatami": 9, "estimatedCapacity": 4 },
+        { "id": "a2", "name": "A2", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "a3", "name": "A3", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "a5", "name": "A5", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "a6", "name": "A6", "tatami": 9, "estimatedCapacity": 4 },
+        { "id": "a7", "name": "A7", "tatami": 9, "estimatedCapacity": 4 },
+        { "id": "g1", "name": "G1", "tatami": 11, "estimatedCapacity": 5 },
+        { "id": "g2", "name": "G2", "tatami": 11, "estimatedCapacity": 5 },
+        { "id": "g3", "name": "G3", "tatami": 11, "estimatedCapacity": 5 },
+        { "id": "b1", "name": "B1", "tatami": 12, "estimatedCapacity": 5 },
+        { "id": "b2", "name": "B2", "tatami": 12, "estimatedCapacity": 5 },
+        { "id": "b3", "name": "B3", "tatami": 13, "estimatedCapacity": 5 },
+        { "id": "e1", "name": "E1", "tatami": 18, "estimatedCapacity": 7 },
+        { "id": "e2", "name": "E2", "tatami": 15, "estimatedCapacity": 6 },
+        { "id": "e3", "name": "E3", "tatami": 16, "estimatedCapacity": 6 },
+        { "id": "cs", "name": "CS", "tatami": 30, "estimatedCapacity": 12 },
+        { "id": "f", "name": "F", "tatami": 14, "estimatedCapacity": 5 }
+      ]
+    },
+    {
+      "id": "noah_takadanobaba",
+      "name": "NOAH高田馬場",
+      "location": "高田馬場",
+      "rooms": [
+        { "id": "a1", "name": "A1", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "a2", "name": "A2", "tatami": 9, "estimatedCapacity": 4 },
+        { "id": "a3", "name": "A3", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "a5", "name": "A5", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "g1", "name": "G1", "tatami": 11, "estimatedCapacity": 5 },
+        { "id": "g2", "name": "G2", "tatami": 11, "estimatedCapacity": 5 },
+        { "id": "b1", "name": "B1", "tatami": 14, "estimatedCapacity": 5 },
+        { "id": "b2", "name": "B2", "tatami": 14, "estimatedCapacity": 5 },
+        { "id": "b3", "name": "B3", "tatami": 14, "estimatedCapacity": 5 },
+        { "id": "e", "name": "E", "tatami": 17, "estimatedCapacity": 6 },
+        { "id": "f", "name": "F", "tatami": 21, "estimatedCapacity": 8 },
+        { "id": "c", "name": "C", "tatami": 30, "estimatedCapacity": 12 }
+      ]
+    },
+    {
+      "id": "noah_ikebukuro",
+      "name": "NOAH池袋",
+      "location": "池袋",
+      "rooms": [
+        { "id": "s", "name": "S", "tatami": 6.5, "estimatedCapacity": 2 },
+        { "id": "a1", "name": "A1", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "a2", "name": "A2", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "a3", "name": "A3", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "a5", "name": "A5", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "b1", "name": "B1", "tatami": 14, "estimatedCapacity": 5 },
+        { "id": "b2", "name": "B2", "tatami": 13, "estimatedCapacity": 5 },
+        { "id": "e1", "name": "E1", "tatami": 20, "estimatedCapacity": 8 },
+        { "id": "e2", "name": "E2", "tatami": 16, "estimatedCapacity": 6 }
+      ]
+    },
+    {
+      "id": "noah_shibuya_honten",
+      "name": "NOAH渋谷本店",
+      "location": "渋谷",
+      "rooms": [
+        { "id": "a1", "name": "A1", "tatami": 7, "estimatedCapacity": 3 },
+        { "id": "a2", "name": "A2", "tatami": 7, "estimatedCapacity": 3 },
+        { "id": "b1", "name": "B1", "tatami": 16, "estimatedCapacity": 6 },
+        { "id": "b2", "name": "B2", "tatami": 15, "estimatedCapacity": 6 },
+        { "id": "b3", "name": "B3", "tatami": 15, "estimatedCapacity": 6 },
+        { "id": "b4", "name": "B4", "tatami": 14, "estimatedCapacity": 5 },
+        { "id": "c", "name": "C", "tatami": 27, "estimatedCapacity": 10 },
+        { "id": "g1", "name": "G1", "tatami": 12, "estimatedCapacity": 5 },
+        { "id": "g2", "name": "G2", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "g3", "name": "G3", "tatami": 11, "estimatedCapacity": 5 },
+        { "id": "s", "name": "S", "tatami": 6, "estimatedCapacity": 2 }
+      ]
+    },
+    {
+      "id": "noah_shibuya_1gou",
+      "name": "NOAH渋谷1号",
+      "location": "渋谷",
+      "rooms": [
+        { "id": "a1", "name": "A1", "tatami": 9, "estimatedCapacity": 4 },
+        { "id": "a2", "name": "A2", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "a3", "name": "A3", "tatami": 7.5, "estimatedCapacity": 3 },
+        { "id": "a5", "name": "A5", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "b1", "name": "B1", "tatami": 12, "estimatedCapacity": 5 },
+        { "id": "b2", "name": "B2", "tatami": 12, "estimatedCapacity": 5 },
+        { "id": "b3", "name": "B3", "tatami": 14, "estimatedCapacity": 5 },
+        { "id": "b5", "name": "B5", "tatami": 11, "estimatedCapacity": 5 },
+        { "id": "e1", "name": "E1", "tatami": 16, "estimatedCapacity": 6 },
+        { "id": "e2", "name": "E2", "tatami": 17, "estimatedCapacity": 6 }
+      ]
+    },
+    {
+      "id": "noah_shibuya_2gou",
+      "name": "NOAH渋谷2号",
+      "location": "渋谷",
+      "rooms": [
+        { "id": "s", "name": "S", "tatami": 7, "estimatedCapacity": 3 },
+        { "id": "a1", "name": "A1", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "a2", "name": "A2", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "a3", "name": "A3", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "g1", "name": "G1", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "g2", "name": "G2", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "g3", "name": "G3", "tatami": 11, "estimatedCapacity": 5 },
+        { "id": "b1", "name": "B1", "tatami": 13, "estimatedCapacity": 5 },
+        { "id": "b2", "name": "B2", "tatami": 14, "estimatedCapacity": 5 },
+        { "id": "b3", "name": "B3", "tatami": 14, "estimatedCapacity": 5 },
+        { "id": "e1", "name": "E1", "tatami": 16, "estimatedCapacity": 6 },
+        { "id": "e2", "name": "E2", "tatami": 16, "estimatedCapacity": 6 },
+        { "id": "c", "name": "C", "tatami": 22, "estimatedCapacity": 8 }
+      ]
+    },
+    {
+      "id": "noah_akihabara",
+      "name": "NOAH秋葉原",
+      "location": "秋葉原",
+      "rooms": [
+        { "id": "a1", "name": "A1", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "a2", "name": "A2", "tatami": 8, "estimatedCapacity": 3 },
+        { "id": "a3", "name": "A3", "tatami": 9, "estimatedCapacity": 4 },
+        { "id": "g1", "name": "G1", "tatami": 12, "estimatedCapacity": 5 },
+        { "id": "g2", "name": "G2", "tatami": 9.5, "estimatedCapacity": 4 },
+        { "id": "gs", "name": "GS", "tatami": 10, "estimatedCapacity": 4 },
+        { "id": "b1", "name": "B1", "tatami": 14, "estimatedCapacity": 5 },
+        { "id": "b2", "name": "B2", "tatami": 13, "estimatedCapacity": 5 },
+        { "id": "e1", "name": "E1", "tatami": 21, "estimatedCapacity": 8 },
+        { "id": "e2", "name": "E2", "tatami": 20, "estimatedCapacity": 8 },
+        { "id": "c", "name": "C", "tatami": 24, "estimatedCapacity": 9 }
+      ]
+    }
+  ]
+}

@@ -27,6 +27,8 @@ const COLLECTIONS = {
   bandRequests: 'bandRequests',
   lotteries: 'lotteries',
   notificationSettings: 'notificationSettings',
+  studios: 'studios',
+  optimizationRuns: 'optimizationRuns',
 };
 
 export const API = {
@@ -709,6 +711,100 @@ export const API = {
     } catch (e) {
       console.error("[API] saveNotificationSettings error:", e);
       return { success: false, message: "エラーが発生しました" };
+    }
+  },
+
+  /* ----- Studios (スケジュール最適化用) ----- */
+
+  async getStudios() {
+    try {
+      const snapshot = await getDocs(collection(db, 'studios'));
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (e) {
+      console.error("[API] getStudios error:", e);
+      return [];
+    }
+  },
+
+  /* ----- Band Availabilities ----- */
+
+  async getAvailabilities(eventId, bandId) {
+    try {
+      const docRef = doc(db, 'events', eventId, 'availabilities', bandId);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists()) return {};
+      return docSnap.data().slots || {};
+    } catch (e) {
+      console.error("[API] getAvailabilities error:", e);
+      return {};
+    }
+  },
+
+  async submitAvailabilities(eventId, bandId, availabilities) {
+    try {
+      const docRef = doc(db, 'events', eventId, 'availabilities', bandId);
+      await setDoc(docRef, {
+        slots: availabilities,
+        submittedAt: serverTimestamp()
+      });
+      return { success: true };
+    } catch (e) {
+      console.error("[API] submitAvailabilities error:", e);
+      throw e;
+    }
+  },
+
+  /* ----- User Bands ----- */
+
+  async getUserBands(userId) {
+    try {
+      const q = query(collection(db, 'bands'), where('members', 'array-contains', userId || 'currentUser'));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (e) {
+      console.error("[API] getUserBands error:", e);
+      return [];
+    }
+  },
+
+  /* ----- Studio Schedules (最適化結果) ----- */
+
+  async getSchedulesByEvent(eventId) {
+    try {
+      const q = query(collection(db, 'studioSchedules'), where('eventId', '==', eventId));
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (e) {
+      console.error("[API] getSchedulesByEvent error:", e);
+      return [];
+    }
+  },
+
+  /* ----- Optimization Runs (診断・ログ) ----- */
+
+  async getLatestOptimizationRun(eventId) {
+    try {
+      const q = query(
+        collection(db, 'optimizationRuns'),
+        where('eventId', '==', eventId),
+        orderBy('startedAt', 'desc'),
+        limit(1)
+      );
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) return null;
+      return snapshot.docs[0].data();
+    } catch (e) {
+      console.error("[API] getLatestOptimizationRun error:", e);
+      return null;
     }
   },
 };

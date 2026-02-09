@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { API } from '../lib/api';
 import { EVENT_TYPES } from '../lib/constants';
+import AvailabilityForm from '../components/AvailabilityForm';
+import ScheduleDisplay from '../components/ScheduleDisplay';
 
 export default function EventsPage() {
   const { isLoggedIn, auth, checkPermission } = useAuth();
@@ -237,8 +239,18 @@ function EventDetailModal({ event, onClose, onUpdated }) {
   const [showSetlistEdit, setShowSetlistEdit] = useState(false);
   const [lottery, setLottery] = useState(null);
   const [showLottery, setShowLottery] = useState(false);
+  const [showAvailabilityForm, setShowAvailabilityForm] = useState(false);
+  const [showScheduleDisplay, setShowScheduleDisplay] = useState(false);
+  const [studios, setStudios] = useState([]);
+  const [userBandId, setUserBandId] = useState(null);
 
-  useEffect(() => { fetchEntries(); fetchTimetableAndSetlists(); fetchLottery(); }, [event.id]);
+  useEffect(() => { 
+    fetchEntries(); 
+    fetchTimetableAndSetlists(); 
+    fetchLottery();
+    fetchStudios();
+    fetchUserBandId();
+  }, [event.id]);
 
   async function fetchTimetableAndSetlists() {
     if (!isLive) return;
@@ -261,6 +273,27 @@ function EventDetailModal({ event, onClose, onUpdated }) {
       setLottery(data);
     } catch (e) {
       console.error('[fetchLottery]', e);
+    }
+  }
+
+  async function fetchStudios() {
+    try {
+      const data = await API.getStudios?.() || [];
+      setStudios(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('[fetchStudios]', e);
+    }
+  }
+
+  async function fetchUserBandId() {
+    if (!isLoggedIn) return;
+    try {
+      const data = await API.getUserBands?.() || [];
+      if (Array.isArray(data) && data.length > 0) {
+        setUserBandId(data[0].id);
+      }
+    } catch (e) {
+      console.error('[fetchUserBandId]', e);
     }
   }
 
@@ -391,6 +424,24 @@ function EventDetailModal({ event, onClose, onUpdated }) {
                 {isLive ? 'バンドでエントリー' : '個人でエントリー'}
               </button>
             )}
+
+            {/* Availability submission */}
+            {isLoggedIn && userBandId && (
+              <button
+                onClick={() => setShowAvailabilityForm(true)}
+                className="w-full mt-2 py-2 bg-blue-500 text-white rounded-xl font-bold text-sm"
+              >
+                📅 利用可能時間を登録
+              </button>
+            )}
+
+            {/* Schedule display */}
+            <button
+              onClick={() => setShowScheduleDisplay(true)}
+              className="w-full mt-2 py-2 bg-purple-500 text-white rounded-xl font-bold text-sm"
+            >
+              📋 スケジュール結果
+            </button>
           </div>
 
           {showEntryForm && (
@@ -398,6 +449,27 @@ function EventDetailModal({ event, onClose, onUpdated }) {
               event={event}
               onClose={() => setShowEntryForm(false)}
               onCreated={() => { setShowEntryForm(false); fetchEntries(); }}
+            />
+          )}
+
+          {showAvailabilityForm && userBandId && (
+            <AvailabilityForm
+              eventId={event.id}
+              bandId={userBandId}
+              eventDate={event.date}
+              windowDays={event.windowDays || 14}
+              onSubmit={async (availabilities) => {
+                await API.submitAvailabilities?.(event.id, userBandId, availabilities);
+              }}
+              onClose={() => setShowAvailabilityForm(false)}
+            />
+          )}
+
+          {showScheduleDisplay && (
+            <ScheduleDisplay
+              eventId={event.id}
+              studios={studios}
+              onClose={() => setShowScheduleDisplay(false)}
             />
           )}
 
